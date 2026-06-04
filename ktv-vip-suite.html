@@ -1,0 +1,2137 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>璀璨之夜 · VIP KTV 豪华包厢</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg-dark: #07040d;
+  --bg-purple: #15082a;
+  --gold: #d4af37;
+  --gold-light: #ffd700;
+  --neon-pink: #ff006e;
+  --neon-cyan: #00f5ff;
+  --neon-purple: #9d4edd;
+  --neon-green: #39ff14;
+  --text-muted: rgba(255, 255, 255, 0.5);
+}
+
+body {
+  font-family: 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', sans-serif;
+  background: var(--bg-dark);
+  color: #fff;
+  min-height: 100vh;
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* 背景氛围 */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(circle at 15% 25%, rgba(157, 78, 221, 0.2) 0%, transparent 45%),
+    radial-gradient(circle at 85% 75%, rgba(255, 0, 110, 0.15) 0%, transparent 45%),
+    radial-gradient(circle at 50% 50%, rgba(0, 245, 255, 0.08) 0%, transparent 60%);
+  pointer-events: none;
+  z-index: 0;
+  animation: ambientShift 20s ease-in-out infinite;
+}
+
+@keyframes ambientShift {
+  0%, 100% { transform: scale(1) rotate(0deg); filter: hue-rotate(0deg); }
+  50% { transform: scale(1.2) rotate(5deg); filter: hue-rotate(30deg); }
+}
+
+/* 颗粒 */
+.particles { position: fixed; inset: 0; z-index: 1; pointer-events: none; overflow: hidden; }
+.particle {
+  position: absolute;
+  width: 2px; height: 2px;
+  background: var(--gold);
+  border-radius: 50%;
+  opacity: 0;
+  animation: float 8s linear infinite;
+  box-shadow: 0 0 6px currentColor;
+}
+@keyframes float {
+  0% { transform: translateY(100vh) translateX(0); opacity: 0; }
+  10% { opacity: 0.8; }
+  90% { opacity: 0.8; }
+  100% { transform: translateY(-10vh) translateX(50px); opacity: 0; }
+}
+
+/* === 激光覆盖层 === */
+.laser-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 3;
+  overflow: hidden;
+}
+.laser {
+  position: absolute;
+  height: 1.5px;
+  filter: blur(0.5px);
+  transform-origin: 0 50%;
+  opacity: 0.7;
+}
+.laser::before {
+  content: '';
+  position: absolute;
+  inset: -1px 0;
+  filter: blur(4px);
+  background: inherit;
+  opacity: 0.5;
+}
+.laser::after {
+  content: '';
+  position: absolute;
+  inset: -3px 0;
+  filter: blur(10px);
+  background: inherit;
+  opacity: 0.3;
+}
+
+.l1 { background: linear-gradient(90deg, transparent, #ff006e 50%, transparent); top: 20%; width: 80%; animation: laserSweep 4s linear infinite; }
+.l2 { background: linear-gradient(90deg, transparent, #00f5ff 50%, transparent); top: 40%; width: 70%; animation: laserSweep 5s linear infinite reverse; animation-delay: 1s; }
+.l3 { background: linear-gradient(90deg, transparent, #9d4edd 50%, transparent); top: 60%; width: 75%; animation: laserSweep 6s linear infinite; animation-delay: 2s; }
+.l4 { background: linear-gradient(90deg, transparent, #39ff14 50%, transparent); top: 80%; width: 65%; animation: laserSweep 7s linear infinite reverse; animation-delay: 0.5s; }
+.l5 { background: linear-gradient(90deg, transparent, #ffd700 50%, transparent); top: 30%; width: 60%; animation: laserSweep 8s linear infinite; animation-delay: 1.5s; }
+
+@keyframes laserSweep {
+  0% { transform: translateX(-100%) rotate(0deg); opacity: 0; }
+  10% { opacity: 0.8; }
+  90% { opacity: 0.8; }
+  100% { transform: translateX(150%) rotate(0deg); opacity: 0; }
+}
+
+/* 频谱激光点 */
+.laser-dot {
+  position: absolute;
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  box-shadow: 0 0 15px currentColor, 0 0 30px currentColor;
+  animation: laserDotMove 3s linear infinite;
+}
+
+@keyframes laserDotMove {
+  0% { transform: translateX(-50px) translateY(0); }
+  50% { transform: translateX(50vw) translateY(-20px); }
+  100% { transform: translateX(100vw) translateY(0); }
+}
+
+/* === 闪烁霓虹灯泡 === */
+.flicker-bulb {
+  position: absolute;
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 10px currentColor, 0 0 20px currentColor;
+  animation: bulbFlicker 0.15s infinite;
+}
+@keyframes bulbFlicker {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(0.95); }
+}
+
+/* 头部 */
+.app-header {
+  position: relative; z-index: 10;
+  padding: 18px 36px;
+  display: flex; justify-content: space-between; align-items: center;
+  background: linear-gradient(180deg, rgba(7, 4, 13, 0.95) 0%, rgba(7, 4, 13, 0) 100%);
+  border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+  backdrop-filter: blur(10px);
+}
+
+.brand { display: flex; align-items: center; gap: 14px; }
+.brand-icon {
+  width: 44px; height: 44px;
+  background: linear-gradient(135deg, var(--gold), var(--gold-light));
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px;
+  box-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
+  position: relative; overflow: hidden;
+}
+.brand-icon::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.4) 50%, transparent 70%);
+  animation: shine 3s linear infinite;
+}
+@keyframes shine { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+.brand-text h1 {
+  font-size: 18px;
+  background: linear-gradient(45deg, var(--gold), var(--gold-light));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: 3px; font-weight: 700;
+  text-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+}
+.brand-text p { font-size: 10px; color: var(--text-muted); letter-spacing: 5px; margin-top: 2px; }
+
+.room-info { text-align: center; position: relative; }
+.room-info::before, .room-info::after { content: '◆'; position: absolute; top: 50%; transform: translateY(-50%); color: var(--gold); font-size: 8px; opacity: 0.5; }
+.room-info::before { left: -20px; } .room-info::after { right: -20px; }
+.room-label { font-size: 10px; color: var(--gold); letter-spacing: 4px; font-weight: 600; }
+.room-title {
+  font-size: 22px; font-weight: bold; margin-top: 4px;
+  background: linear-gradient(45deg, #fff, var(--gold-light));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: 6px;
+  animation: titleGlow 3s ease-in-out infinite;
+}
+@keyframes titleGlow {
+  0%, 100% { filter: drop-shadow(0 0 5px rgba(255, 215, 0, 0.3)); }
+  50% { filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.7)); }
+}
+
+.user-panel { display: flex; align-items: center; gap: 14px; }
+.balance {
+  display: flex; align-items: center; gap: 6px;
+  padding: 8px 16px;
+  background: rgba(212, 175, 55, 0.1);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  border-radius: 20px;
+  font-size: 13px; color: var(--gold); font-weight: 600;
+}
+.avatar {
+  width: 42px; height: 42px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--neon-pink), var(--neon-purple));
+  display: flex; align-items: center; justify-content: center;
+  font-weight: bold;
+  border: 2px solid var(--gold);
+  box-shadow: 0 0 20px rgba(255, 0, 110, 0.4);
+  font-size: 16px;
+}
+
+/* 主体 */
+.main-layout {
+  position: relative; z-index: 5;
+  display: grid;
+  grid-template-columns: 1fr 1.4fr;
+  gap: 24px;
+  padding: 24px 36px;
+  min-height: calc(100vh - 80px);
+}
+@media (max-width: 1100px) { .main-layout { grid-template-columns: 1fr; } }
+
+.panel {
+  background: linear-gradient(135deg, rgba(21, 8, 42, 0.7), rgba(7, 4, 13, 0.9));
+  border: 1px solid rgba(212, 175, 55, 0.2);
+  border-radius: 20px;
+  padding: 24px;
+  position: relative; overflow: hidden;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 60px rgba(212, 175, 55, 0.05);
+}
+.panel::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  animation: scan 4s linear infinite;
+}
+@keyframes scan { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+
+/* === 平面图卡片 - 带图片 === */
+.floor-plan { display: flex; flex-direction: column; }
+
+.plan-title {
+  text-align: center; margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(212, 175, 55, 0.15);
+}
+.plan-title h2 {
+  font-size: 18px; color: var(--gold);
+  letter-spacing: 4px; font-weight: 600;
+  text-shadow: 0 0 10px rgba(212, 175, 55, 0.4);
+}
+.plan-title p { font-size: 10px; color: var(--text-muted); margin-top: 4px; letter-spacing: 3px; }
+
+.plan-grid {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 12px;
+  flex: 1;
+}
+
+.area-card {
+  position: relative;
+  background: linear-gradient(135deg, rgba(42, 18, 69, 0.5), rgba(21, 8, 42, 0.7));
+  border: 1.5px solid rgba(212, 175, 55, 0.2);
+  border-radius: 14px;
+  padding: 0;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  display: flex; flex-direction: column;
+  justify-content: flex-end;
+  overflow: hidden;
+  min-height: 180px;
+}
+
+.area-card-img {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  filter: brightness(0.5) saturate(1.2);
+  transition: all 0.5s;
+  z-index: 0;
+}
+.area-card:hover .area-card-img { filter: brightness(0.7) saturate(1.4); transform: scale(1.05); }
+.area-card.active .area-card-img { filter: brightness(0.6) saturate(1.4); }
+
+.area-card-content {
+  position: relative;
+  z-index: 2;
+  padding: 16px;
+  background: linear-gradient(180deg, transparent 0%, rgba(7, 4, 13, 0.9) 80%);
+  display: flex; flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+}
+
+.area-card::after {
+  content: ''; position: absolute; inset: -2px;
+  background: linear-gradient(45deg, var(--neon-pink), var(--gold), var(--neon-cyan), var(--neon-purple));
+  background-size: 300% 300%;
+  border-radius: 14px;
+  z-index: -1; opacity: 0;
+  transition: opacity 0.4s;
+  animation: gradient 6s ease infinite;
+}
+@keyframes gradient { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+
+.area-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--gold);
+  box-shadow: 0 12px 30px rgba(212, 175, 55, 0.4), 0 0 50px rgba(212, 175, 55, 0.2);
+}
+.area-card.active {
+  border-color: var(--gold);
+  box-shadow: 0 0 30px rgba(212, 175, 55, 0.5), inset 0 0 30px rgba(212, 175, 55, 0.1);
+}
+.area-card.active::after { opacity: 0.6; }
+.area-card.featured { grid-row: span 2; }
+
+.area-icon-wrap {
+  width: 44px; height: 44px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.3), rgba(157, 78, 221, 0.3));
+  backdrop-filter: blur(8px);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px;
+  border: 1px solid rgba(212, 175, 55, 0.4);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+}
+.area-card.active .area-icon-wrap {
+  background: linear-gradient(135deg, var(--gold), var(--gold-light));
+  color: var(--bg-dark);
+  box-shadow: 0 0 20px rgba(212, 175, 55, 0.6);
+}
+
+.area-name {
+  font-size: 17px; font-weight: bold; color: #fff;
+  margin-bottom: 4px; letter-spacing: 1px;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8), 0 0 10px rgba(212, 175, 55, 0.3);
+}
+.area-sub { font-size: 10px; color: rgba(255, 255, 255, 0.7); letter-spacing: 2px; margin-bottom: 10px; }
+.area-status {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 10px; padding: 4px 10px;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(0, 245, 255, 0.4);
+  color: var(--neon-cyan);
+  width: fit-content; font-weight: 600;
+  backdrop-filter: blur(4px);
+}
+.area-status.busy { border-color: rgba(255, 0, 110, 0.4); color: var(--neon-pink); }
+.area-status.idle { border-color: rgba(255, 215, 0, 0.4); color: var(--gold-light); }
+
+.status-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: currentColor;
+  animation: pulse 1.5s ease-in-out infinite;
+  box-shadow: 0 0 6px currentColor;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(1.4); }
+}
+
+/* 详情面板 */
+.detail-panel { display: flex; flex-direction: column; position: relative; min-height: 600px; }
+
+.detail-header {
+  display: flex; justify-content: space-between; align-items: center;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(212, 175, 55, 0.15);
+  margin-bottom: 20px;
+  position: relative; z-index: 5;
+}
+.detail-title { display: flex; align-items: center; gap: 14px; }
+.detail-title-icon {
+  width: 50px; height: 50px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--gold), var(--gold-light));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 24px; color: var(--bg-dark);
+  box-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
+}
+.detail-title h3 {
+  font-size: 20px;
+  background: linear-gradient(45deg, var(--gold), var(--gold-light));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: 3px; font-weight: 700;
+}
+.detail-title p { font-size: 11px; color: var(--text-muted); margin-top: 2px; letter-spacing: 2px; }
+
+.close-btn {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(212, 175, 55, 0.2);
+  color: var(--gold);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+  transition: all 0.3s;
+}
+.close-btn:hover { background: rgba(212, 175, 55, 0.1); transform: rotate(90deg); }
+
+.detail-content { flex: 1; display: flex; flex-direction: column; gap: 16px; position: relative; }
+
+/* === 唱区 - 真实舞台背景 + 激光 + 频谱 === */
+.singing-view {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  gap: 16px;
+  height: 100%;
+}
+
+.karaoke-screen {
+  position: relative;
+  border: 2px solid rgba(212, 175, 55, 0.4);
+  border-radius: 16px;
+  overflow: hidden;
+  min-height: 480px;
+  display: flex; flex-direction: column;
+  justify-content: space-between;
+  padding: 24px;
+  background: #000;
+  box-shadow: 0 0 50px rgba(255, 0, 110, 0.2), inset 0 0 50px rgba(0, 0, 0, 0.5);
+}
+
+.karaoke-bg {
+  position: absolute; inset: 0;
+  background: url('https://images.unsplash.com/photo-1493676304819-0d7a8d026dcf?w=1200&q=80&auto=format&fit=crop') center/cover;
+  filter: brightness(0.4) saturate(1.3);
+  z-index: 0;
+}
+
+.karaoke-screen::before {
+  content: ''; position: absolute; inset: 0;
+  background:
+    radial-gradient(circle at 30% 20%, rgba(255, 0, 110, 0.4) 0%, transparent 50%),
+    radial-gradient(circle at 70% 80%, rgba(0, 245, 255, 0.3) 0%, transparent 50%),
+    radial-gradient(circle at 50% 50%, rgba(157, 78, 221, 0.2) 0%, transparent 60%);
+  z-index: 1;
+  animation: stagePulse 3s ease-in-out infinite;
+}
+
+@keyframes stagePulse {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+/* 舞台射灯 */
+.stage-light {
+  position: absolute;
+  top: -50px;
+  width: 200px; height: 400px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.3) 0%, transparent 100%);
+  filter: blur(30px);
+  z-index: 2;
+  transform-origin: top center;
+  animation: lightSway 4s ease-in-out infinite;
+  mix-blend-mode: screen;
+}
+.stage-light.l1 { left: 10%; background: linear-gradient(180deg, rgba(255, 0, 110, 0.4) 0%, transparent 100%); animation-delay: 0s; }
+.stage-light.l2 { left: 40%; background: linear-gradient(180deg, rgba(0, 245, 255, 0.4) 0%, transparent 100%); animation-delay: 1s; }
+.stage-light.l3 { left: 70%; background: linear-gradient(180deg, rgba(157, 78, 221, 0.4) 0%, transparent 100%); animation-delay: 2s; }
+.stage-light.l4 { left: 25%; background: linear-gradient(180deg, rgba(255, 215, 0, 0.3) 0%, transparent 100%); animation-delay: 0.5s; }
+.stage-light.l5 { left: 55%; background: linear-gradient(180deg, rgba(57, 255, 20, 0.3) 0%, transparent 100%); animation-delay: 1.5s; }
+
+@keyframes lightSway {
+  0%, 100% { transform: rotate(-15deg) scaleX(1); opacity: 0.6; }
+  50% { transform: rotate(15deg) scaleX(1.2); opacity: 1; }
+}
+
+.screen-top {
+  position: relative; z-index: 5;
+  display: flex; justify-content: space-between; align-items: flex-start;
+}
+.now-playing-tag {
+  background: rgba(255, 0, 110, 0.3);
+  border: 1px solid var(--neon-pink);
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 11px; color: var(--neon-pink);
+  font-weight: 600;
+  display: flex; align-items: center; gap: 6px;
+  letter-spacing: 1px;
+  backdrop-filter: blur(8px);
+  text-shadow: 0 0 8px var(--neon-pink);
+  box-shadow: 0 0 15px rgba(255, 0, 110, 0.4);
+}
+.rec-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--neon-pink);
+  animation: recBlink 1s ease-in-out infinite;
+  box-shadow: 0 0 8px var(--neon-pink);
+}
+@keyframes recBlink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+.score-display { text-align: right; font-size: 11px; color: rgba(255, 255, 255, 0.7); }
+.score-num {
+  font-size: 24px; font-weight: bold;
+  background: linear-gradient(45deg, var(--gold), var(--gold-light));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+}
+
+.lyrics-area {
+  position: relative; z-index: 5;
+  flex: 1;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  text-align: center;
+  padding: 20px 0;
+}
+.lyric-line {
+  font-size: 22px; margin: 8px 0;
+  color: rgba(255, 255, 255, 0.3);
+  transition: all 0.3s;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+  letter-spacing: 2px;
+}
+.lyric-line.active {
+  color: #fff;
+  font-size: 32px; font-weight: bold;
+  text-shadow:
+    0 0 20px rgba(255, 0, 110, 0.9),
+    0 0 40px rgba(255, 0, 110, 0.5),
+    0 0 60px rgba(255, 0, 110, 0.3);
+  transform: scale(1.05);
+  animation: lyricPop 0.5s ease;
+}
+@keyframes lyricPop {
+  0% { transform: scale(0.9); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1.05); }
+}
+
+.screen-bottom {
+  position: relative; z-index: 5;
+  display: flex; justify-content: space-between; align-items: center;
+}
+
+/* 频谱可视化器 */
+.spectrum {
+  display: flex; gap: 3px;
+  align-items: flex-end;
+  height: 40px;
+  padding: 4px 8px;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  border-radius: 8px;
+  backdrop-filter: blur(8px);
+}
+.spec-bar {
+  width: 4px;
+  background: linear-gradient(to top, var(--neon-pink), var(--gold), var(--neon-cyan));
+  border-radius: 2px;
+  height: 10%;
+  transition: height 0.05s;
+  box-shadow: 0 0 4px currentColor;
+}
+
+.song-info {
+  font-size: 12px; color: rgba(255, 255, 255, 0.7);
+  text-align: right;
+  text-shadow: 0 0 8px rgba(0, 0, 0, 0.8);
+}
+.song-info strong {
+  display: block; font-size: 14px;
+  color: var(--gold); margin-bottom: 2px;
+  text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+}
+
+/* 音频进度 */
+.audio-progress {
+  position: relative; z-index: 5;
+  margin-top: 12px;
+  display: flex; align-items: center; gap: 10px;
+  font-size: 11px; color: rgba(255, 255, 255, 0.7);
+}
+.progress-bar {
+  flex: 1; height: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px; overflow: hidden;
+  position: relative; cursor: pointer;
+}
+.progress-fill {
+  position: absolute; inset: 0 70% 0 0;
+  background: linear-gradient(90deg, var(--neon-pink), var(--gold), var(--neon-cyan));
+  border-radius: 2px;
+  box-shadow: 0 0 8px var(--neon-pink);
+  transition: right 0.1s linear;
+}
+
+.play-control {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--neon-pink), var(--neon-purple));
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px;
+  box-shadow: 0 0 15px rgba(255, 0, 110, 0.5);
+  transition: all 0.3s;
+}
+.play-control:hover { transform: scale(1.1); box-shadow: 0 0 25px rgba(255, 0, 110, 0.8); }
+
+.song-list {
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(212, 175, 55, 0.15);
+  border-radius: 12px;
+  padding: 16px;
+  display: flex; flex-direction: column;
+  backdrop-filter: blur(8px);
+}
+.song-list-title {
+  font-size: 13px; color: var(--gold);
+  margin-bottom: 12px;
+  display: flex; justify-content: space-between; align-items: center;
+  letter-spacing: 1px;
+}
+.song-list-title span { font-size: 10px; color: var(--text-muted); }
+
+.song-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-bottom: 4px;
+  position: relative;
+}
+.song-item:hover { background: rgba(212, 175, 55, 0.1); transform: translateX(4px); }
+.song-item.playing {
+  background: linear-gradient(90deg, rgba(255, 0, 110, 0.2), transparent);
+  border-left: 3px solid var(--neon-pink);
+  box-shadow: 0 0 15px rgba(255, 0, 110, 0.2);
+}
+
+.song-num {
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  background: rgba(212, 175, 55, 0.1);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; color: var(--gold); font-weight: 600;
+  flex-shrink: 0;
+}
+.song-item.playing .song-num {
+  background: var(--neon-pink);
+  color: #fff;
+  animation: pulse 1.5s ease-in-out infinite;
+  box-shadow: 0 0 10px var(--neon-pink);
+}
+
+.song-meta { flex: 1; min-width: 0; }
+.song-title {
+  font-size: 13px; color: #fff;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.song-artist { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+.song-action { font-size: 12px; color: var(--gold); }
+
+/* === 酒水区 - 真实酒吧背景 === */
+.bar-view {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 16px;
+  height: 100%;
+}
+
+.bar-stage {
+  position: relative;
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  border-radius: 16px;
+  padding: 20px;
+  min-height: 480px;
+  display: flex; flex-direction: column; justify-content: space-between;
+  overflow: hidden;
+  background: #000;
+  box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.5);
+}
+.bar-stage-bg {
+  position: absolute; inset: 0;
+  background: url('https://images.unsplash.com/photo-1572116469696-31de0f17cc34?w=1200&q=80&auto=format&fit=crop') center/cover;
+  filter: brightness(0.5) saturate(1.2);
+  z-index: 0;
+}
+.bar-stage::before {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(180deg, rgba(21, 8, 42, 0.4) 0%, rgba(7, 4, 13, 0.7) 100%);
+  z-index: 1;
+}
+
+.shelf {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-bottom: 12px;
+  position: relative;
+  z-index: 3;
+}
+.bottle {
+  height: 90px;
+  border-radius: 8px 8px 4px 4px;
+  position: relative;
+  display: flex; align-items: flex-end; justify-content: center;
+  font-size: 24px;
+  padding-bottom: 4px;
+  transition: all 0.3s;
+  cursor: pointer;
+  overflow: hidden;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+}
+.bottle::before {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.4) 0%, transparent 50%);
+}
+.bottle::after {
+  content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+  width: 30%; height: 18px;
+  background: inherit;
+  filter: brightness(1.3);
+  border-radius: 4px 4px 0 0;
+}
+.bottle:hover { transform: translateY(-8px) rotate(-2deg); filter: brightness(1.3); }
+
+.bottle.amber { background: linear-gradient(180deg, #d4a017 0%, #8b5a00 100%); }
+.bottle.green { background: linear-gradient(180deg, #2d8659 0%, #0d4a2a 100%); }
+.bottle.red { background: linear-gradient(180deg, #c41e3a 0%, #5a0a1a 100%); }
+.bottle.clear { background: linear-gradient(180deg, #e8d4a8 0%, #8b6f47 100%); }
+.bottle.purple { background: linear-gradient(180deg, #6b2d8c 0%, #2d0d4a 100%); }
+.bottle.blue { background: linear-gradient(180deg, #1e5fa8 0%, #0a2d5a 100%); }
+.bottle.pink { background: linear-gradient(180deg, #ff6b9d 0%, #c41e5e 100%); }
+.bottle.dark { background: linear-gradient(180deg, #4a2c1a 0%, #1a0a05 100%); }
+
+.bar-counter {
+  height: 30px;
+  background: linear-gradient(180deg, var(--gold) 0%, #5a4015 50%, #1a0a05 100%);
+  border-radius: 4px;
+  margin-top: 8px;
+  position: relative;
+  z-index: 3;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.shelf-tag {
+  position: absolute; top: 8px; right: 12px;
+  font-size: 9px; color: var(--gold);
+  letter-spacing: 2px;
+  z-index: 3;
+  text-shadow: 0 0 8px rgba(212, 175, 55, 0.6);
+}
+
+.bar-light {
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent);
+  animation: scan 3s linear infinite;
+  z-index: 3;
+}
+
+.menu-list {
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(212, 175, 55, 0.15);
+  border-radius: 12px;
+  padding: 16px;
+  display: flex; flex-direction: column;
+  overflow: hidden;
+  backdrop-filter: blur(8px);
+}
+
+.menu-tabs { display: flex; gap: 6px; margin-bottom: 14px; flex-wrap: wrap; }
+.menu-tab {
+  padding: 6px 12px;
+  border-radius: 16px;
+  font-size: 11px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(212, 175, 55, 0.15);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.3s;
+  letter-spacing: 1px;
+}
+.menu-tab:hover { color: var(--gold); border-color: var(--gold); }
+.menu-tab.active {
+  background: linear-gradient(135deg, var(--gold), var(--gold-light));
+  color: var(--bg-dark);
+  font-weight: 600;
+  border-color: var(--gold);
+  box-shadow: 0 0 10px rgba(212, 175, 55, 0.4);
+}
+
+.drinks-scroll {
+  flex: 1; overflow-y: auto;
+  display: flex; flex-direction: column; gap: 8px;
+  padding-right: 4px;
+}
+.drinks-scroll::-webkit-scrollbar { width: 4px; }
+.drinks-scroll::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.05); }
+.drinks-scroll::-webkit-scrollbar-thumb { background: var(--gold-dim, #8a7220); border-radius: 2px; }
+
+.drink-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(212, 175, 55, 0.1);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+.drink-item:hover {
+  background: rgba(212, 175, 55, 0.1);
+  border-color: var(--gold);
+  transform: translateX(4px);
+  box-shadow: 0 0 15px rgba(212, 175, 55, 0.2);
+}
+.drink-emoji {
+  width: 44px; height: 44px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.2), rgba(157, 78, 221, 0.2));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px;
+  flex-shrink: 0;
+}
+.drink-info { flex: 1; min-width: 0; }
+.drink-name { font-size: 13px; color: #fff; font-weight: 500; }
+.drink-desc { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+.drink-price {
+  font-size: 14px; color: var(--gold); font-weight: bold;
+  flex-shrink: 0;
+  text-shadow: 0 0 8px rgba(212, 175, 55, 0.3);
+}
+.drink-price small {
+  font-size: 9px; color: var(--text-muted);
+  font-weight: normal; display: block; text-align: right;
+}
+
+/* === 游戏区 === */
+.gaming-view {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  height: 100%;
+}
+
+.dice-game {
+  background: linear-gradient(135deg, rgba(42, 18, 69, 0.5), rgba(21, 8, 42, 0.7));
+  border: 1.5px solid rgba(212, 175, 55, 0.2);
+  border-radius: 14px;
+  padding: 16px;
+  grid-column: span 2;
+  display: flex; align-items: center; gap: 20px;
+  min-height: 180px;
+  position: relative;
+  overflow: hidden;
+}
+.dice-game-bg {
+  position: absolute; inset: 0;
+  background: url('https://images.unsplash.com/photo-1518893063132-36e46dbe2428?w=1200&q=80&auto=format&fit=crop') center/cover;
+  filter: brightness(0.3) saturate(1.2);
+  z-index: 0;
+}
+.dice-game::before {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(42, 18, 69, 0.6), rgba(21, 8, 42, 0.6));
+  z-index: 1;
+}
+.dice-game > * { position: relative; z-index: 2; }
+
+.dice-display { display: flex; gap: 14px; }
+.die {
+  width: 64px; height: 64px;
+  background: linear-gradient(135deg, #fff 0%, #e8d4a8 100%);
+  border-radius: 10px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  padding: 10px; gap: 4px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6), inset 0 0 10px rgba(212, 175, 55, 0.2);
+  transition: transform 0.5s;
+}
+.die.rolling { animation: rollDice 0.6s ease-in-out; }
+@keyframes rollDice {
+  0% { transform: rotateX(0) rotateY(0) scale(1); }
+  25% { transform: rotateX(180deg) rotateY(90deg) scale(0.8); }
+  50% { transform: rotateX(360deg) rotateY(180deg) scale(1.1); }
+  75% { transform: rotateX(540deg) rotateY(270deg) scale(0.9); }
+  100% { transform: rotateX(720deg) rotateY(360deg) scale(1); }
+}
+.dot {
+  background: var(--bg-dark);
+  border-radius: 50%;
+  width: 100%; height: 100%;
+  opacity: 0;
+}
+.die[data-value="1"] .dot:nth-child(5) { opacity: 1; }
+.die[data-value="2"] .dot:nth-child(1),
+.die[data-value="2"] .dot:nth-child(9) { opacity: 1; }
+.die[data-value="3"] .dot:nth-child(1),
+.die[data-value="3"] .dot:nth-child(5),
+.die[data-value="3"] .dot:nth-child(9) { opacity: 1; }
+.die[data-value="4"] .dot:nth-child(1),
+.die[data-value="4"] .dot:nth-child(3),
+.die[data-value="4"] .dot:nth-child(7),
+.die[data-value="4"] .dot:nth-child(9) { opacity: 1; }
+.die[data-value="5"] .dot:nth-child(1),
+.die[data-value="5"] .dot:nth-child(3),
+.die[data-value="5"] .dot:nth-child(5),
+.die[data-value="5"] .dot:nth-child(7),
+.die[data-value="5"] .dot:nth-child(9) { opacity: 1; }
+.die[data-value="6"] .dot:nth-child(1),
+.die[data-value="6"] .dot:nth-child(3),
+.die[data-value="6"] .dot:nth-child(4),
+.die[data-value="6"] .dot:nth-child(6),
+.die[data-value="6"] .dot:nth-child(7),
+.die[data-value="6"] .dot:nth-child(9) { opacity: 1; }
+
+.dice-info { flex: 1; }
+.dice-title { font-size: 18px; color: var(--gold); font-weight: bold; margin-bottom: 4px; text-shadow: 0 0 10px rgba(212, 175, 55, 0.4); }
+.dice-desc { font-size: 12px; color: rgba(255, 255, 255, 0.7); margin-bottom: 14px; }
+.dice-result { font-size: 13px; color: #fff; margin-bottom: 12px; min-height: 20px; }
+.dice-result.win { color: var(--neon-cyan); text-shadow: 0 0 8px var(--neon-cyan); }
+.dice-result.lose { color: var(--neon-pink); text-shadow: 0 0 8px var(--neon-pink); }
+
+.roll-btn {
+  padding: 10px 24px;
+  background: linear-gradient(135deg, var(--gold), var(--gold-light));
+  border: none;
+  border-radius: 8px;
+  color: var(--bg-dark);
+  font-size: 13px; font-weight: bold;
+  cursor: pointer;
+  letter-spacing: 2px;
+  box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4), 0 0 20px rgba(212, 175, 55, 0.2);
+  transition: all 0.3s;
+}
+.roll-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(212, 175, 55, 0.6), 0 0 30px rgba(212, 175, 55, 0.4); }
+.roll-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+.slot-game {
+  background: linear-gradient(135deg, rgba(42, 18, 69, 0.5), rgba(21, 8, 42, 0.7));
+  border: 1.5px solid rgba(212, 175, 55, 0.2);
+  border-radius: 14px;
+  padding: 16px;
+  display: flex; flex-direction: column; align-items: center; text-align: center;
+}
+.slot-icon { font-size: 28px; margin-bottom: 4px; }
+.slot-title { font-size: 14px; color: var(--gold); font-weight: bold; margin-bottom: 8px; text-shadow: 0 0 10px rgba(212, 175, 55, 0.4); }
+
+.slot-machine {
+  display: flex; gap: 6px; margin-bottom: 12px;
+  padding: 8px;
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 8px;
+  border: 1px solid var(--gold);
+  box-shadow: inset 0 0 20px rgba(212, 175, 55, 0.2);
+}
+.slot-reel {
+  width: 50px; height: 50px;
+  background: linear-gradient(180deg, #fff 0%, var(--gold) 100%);
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 28px;
+  overflow: hidden; position: relative;
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.3);
+}
+.slot-reel.spinning { animation: slotShake 0.1s linear infinite; }
+@keyframes slotShake {
+  0% { transform: translateY(-2px); }
+  100% { transform: translateY(2px); }
+}
+
+.slot-btn {
+  padding: 8px 20px;
+  background: linear-gradient(135deg, var(--neon-pink), var(--neon-purple));
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 12px; font-weight: bold;
+  cursor: pointer;
+  letter-spacing: 1px;
+  box-shadow: 0 0 15px rgba(255, 0, 110, 0.4);
+  transition: all 0.3s;
+}
+.slot-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 20px rgba(255, 0, 110, 0.6); }
+
+.memory-game {
+  background: linear-gradient(135deg, rgba(42, 18, 69, 0.5), rgba(21, 8, 42, 0.7));
+  border: 1.5px solid rgba(212, 175, 55, 0.2);
+  border-radius: 14px;
+  padding: 16px;
+  display: flex; flex-direction: column;
+}
+.memory-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.memory-title { font-size: 14px; color: var(--gold); font-weight: bold; text-shadow: 0 0 10px rgba(212, 175, 55, 0.4); }
+.memory-stats { font-size: 11px; color: var(--neon-cyan); text-shadow: 0 0 8px var(--neon-cyan); }
+.memory-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px; flex: 1;
+}
+.memory-card {
+  aspect-ratio: 1;
+  background: linear-gradient(135deg, var(--neon-purple), var(--neon-pink));
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px;
+  cursor: pointer;
+  transition: all 0.3s;
+  position: relative;
+  transform-style: preserve-3d;
+}
+.memory-card .back {
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg, var(--neon-purple), var(--neon-pink));
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; color: rgba(255, 255, 255, 0.5);
+  backface-visibility: hidden;
+  transition: transform 0.4s;
+}
+.memory-card .front {
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg, #fff 0%, #ffd700 100%);
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; color: var(--bg-dark);
+  backface-visibility: hidden;
+  transform: rotateY(180deg);
+  transition: transform 0.4s;
+}
+.memory-card.flipped .back { transform: rotateY(180deg); }
+.memory-card.flipped .front { transform: rotateY(0); }
+.memory-card.matched {
+  background: linear-gradient(135deg, var(--neon-cyan), #00a8a8);
+  box-shadow: 0 0 15px rgba(0, 245, 255, 0.5);
+}
+.memory-card.matched .back { transform: rotateY(180deg); }
+.memory-card.matched .front { transform: rotateY(0); }
+
+/* === 休憩区 === */
+.rest-view {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  height: 100%;
+}
+.rest-main {
+  background: linear-gradient(135deg, rgba(42, 18, 69, 0.5), rgba(21, 8, 42, 0.7));
+  border: 1.5px solid rgba(212, 175, 55, 0.2);
+  border-radius: 14px;
+  padding: 20px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  text-align: center;
+  position: relative; overflow: hidden;
+  min-height: 280px;
+}
+.rest-main-bg {
+  position: absolute; inset: 0;
+  background: url('https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=1200&q=80&auto=format&fit=crop') center/cover;
+  filter: brightness(0.4) saturate(1.1);
+  z-index: 0;
+}
+.rest-main::before {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(180deg, rgba(42, 18, 69, 0.5) 0%, rgba(7, 4, 13, 0.8) 100%);
+  z-index: 1;
+}
+.rest-main > * { position: relative; z-index: 2; }
+
+.door-status {
+  width: 120px; height: 120px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--neon-cyan) 0%, transparent 70%);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 50px;
+  margin-bottom: 16px;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.4s;
+  animation: doorPulse 2s ease-in-out infinite;
+}
+@keyframes doorPulse {
+  0%, 100% { box-shadow: 0 0 30px var(--neon-cyan); }
+  50% { box-shadow: 0 0 60px var(--neon-cyan); }
+}
+.door-status::before {
+  content: ''; position: absolute; inset: -10px;
+  border: 2px solid var(--neon-cyan);
+  border-radius: 50%;
+  animation: doorPing 2s ease-out infinite;
+}
+@keyframes doorPing {
+  0% { transform: scale(1); opacity: 1; }
+  100% { transform: scale(1.4); opacity: 0; }
+}
+.door-status.occupied { background: radial-gradient(circle, var(--neon-pink) 0%, transparent 70%); }
+.door-status.occupied::before { border-color: var(--neon-pink); }
+.door-text { font-size: 18px; color: var(--neon-cyan); font-weight: bold; margin-bottom: 4px; letter-spacing: 3px; text-shadow: 0 0 10px var(--neon-cyan); }
+.door-text.occupied { color: var(--neon-pink); text-shadow: 0 0 10px var(--neon-pink); }
+.door-sub { font-size: 11px; color: rgba(255, 255, 255, 0.7); margin-bottom: 16px; }
+.door-toggle {
+  padding: 8px 24px;
+  background: transparent;
+  border: 1px solid var(--gold);
+  color: var(--gold);
+  border-radius: 20px;
+  font-size: 12px; cursor: pointer;
+  letter-spacing: 1px;
+  transition: all 0.3s;
+  backdrop-filter: blur(8px);
+}
+.door-toggle:hover { background: var(--gold); color: var(--bg-dark); box-shadow: 0 0 20px var(--gold); }
+
+.amenities {
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(212, 175, 55, 0.15);
+  border-radius: 12px;
+  padding: 16px;
+  backdrop-filter: blur(8px);
+}
+.amenities-title { font-size: 14px; color: var(--gold); font-weight: bold; margin-bottom: 12px; letter-spacing: 1px; text-shadow: 0 0 10px rgba(212, 175, 55, 0.4); }
+.amenity-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.amenity-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(212, 175, 55, 0.1);
+  border-radius: 8px;
+  font-size: 11px; color: rgba(255, 255, 255, 0.8);
+}
+
+.ambience-control {
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(212, 175, 55, 0.15);
+  border-radius: 12px;
+  padding: 16px;
+  grid-column: span 2;
+  backdrop-filter: blur(8px);
+}
+.amb-title { font-size: 13px; color: var(--gold); margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+.amb-title span { font-size: 10px; color: var(--neon-cyan); }
+.amb-modes { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.amb-mode {
+  padding: 10px 8px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(212, 175, 55, 0.15);
+  border-radius: 8px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-size: 11px; color: rgba(255, 255, 255, 0.7);
+}
+.amb-mode:hover { border-color: var(--gold); }
+.amb-mode.active {
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.2), rgba(157, 78, 221, 0.2));
+  border-color: var(--gold);
+  color: var(--gold);
+  box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
+}
+.amb-mode-icon { font-size: 20px; margin-bottom: 4px; }
+
+/* 飞入通知 */
+.toast {
+  position: fixed;
+  top: 100px; right: 36px;
+  padding: 14px 20px;
+  background: linear-gradient(135deg, rgba(42, 18, 69, 0.95), rgba(21, 8, 42, 0.95));
+  border: 1px solid var(--gold);
+  border-radius: 12px;
+  color: #fff;
+  font-size: 13px;
+  z-index: 1000;
+  display: flex; align-items: center; gap: 10px;
+  box-shadow: 0 8px 30px rgba(212, 175, 55, 0.3), 0 0 30px rgba(212, 175, 55, 0.1);
+  backdrop-filter: blur(10px);
+  transform: translateX(120%);
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  max-width: 320px;
+}
+.toast.show { transform: translateX(0); }
+.toast-icon { font-size: 20px; }
+.toast-content strong { color: var(--gold); display: block; margin-bottom: 2px; font-size: 13px; }
+.toast-content p { color: var(--text-muted); font-size: 11px; }
+
+/* 底部控制栏 */
+.footer-bar {
+  position: relative; z-index: 5;
+  margin: 0 36px 24px;
+  padding: 14px 24px;
+  background: linear-gradient(135deg, rgba(21, 8, 42, 0.8), rgba(7, 4, 13, 0.9));
+  border: 1px solid rgba(212, 175, 55, 0.15);
+  border-radius: 14px;
+  display: flex; justify-content: space-between; align-items: center;
+  backdrop-filter: blur(10px);
+  flex-wrap: wrap; gap: 12px;
+}
+.footer-info { display: flex; align-items: center; gap: 18px; font-size: 12px; color: var(--text-muted); }
+.footer-info strong { color: var(--gold); font-size: 14px; margin-right: 4px; }
+.footer-controls { display: flex; align-items: center; gap: 10px; }
+
+.ctrl-btn {
+  padding: 8px 14px;
+  background: rgba(212, 175, 55, 0.1);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  border-radius: 8px;
+  color: var(--gold);
+  font-size: 12px;
+  cursor: pointer;
+  display: flex; align-items: center; gap: 6px;
+  transition: all 0.3s;
+}
+.ctrl-btn:hover { background: rgba(212, 175, 55, 0.2); transform: translateY(-2px); }
+.ctrl-btn.primary {
+  background: linear-gradient(135deg, var(--neon-pink), var(--neon-purple));
+  color: #fff;
+  border-color: transparent;
+  box-shadow: 0 0 15px rgba(255, 0, 110, 0.3);
+}
+.ctrl-btn.primary:hover { box-shadow: 0 4px 20px rgba(255, 0, 110, 0.5); }
+
+.volume {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 14px;
+  background: rgba(212, 175, 55, 0.1);
+  border: 1px solid rgba(212, 175, 55, 0.2);
+  border-radius: 8px;
+}
+.volume-bar {
+  width: 80px; height: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px; overflow: hidden;
+  position: relative;
+}
+.volume-fill {
+  position: absolute; inset: 0;
+  background: linear-gradient(90deg, var(--gold), var(--gold-light));
+  width: 70%;
+  border-radius: 2px;
+}
+.volume-icon { color: var(--gold); }
+
+/* 烟花 */
+.fireworks { position: fixed; inset: 0; pointer-events: none; z-index: 999; }
+.firework {
+  position: absolute;
+  width: 4px; height: 4px;
+  border-radius: 50%;
+  animation: firework 1.5s ease-out forwards;
+}
+@keyframes firework {
+  0% { transform: translate(0, 0) scale(0); opacity: 1; }
+  50% { opacity: 1; }
+  100% { transform: translate(var(--x), var(--y)) scale(1); opacity: 0; }
+}
+
+/* 扫码线 */
+.scan-line {
+  position: absolute;
+  left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(0, 245, 255, 0.6), transparent);
+  z-index: 4;
+  animation: scanV 4s linear infinite;
+  pointer-events: none;
+}
+@keyframes scanV {
+  0% { top: 0; }
+  100% { top: 100%; }
+}
+</style>
+</head>
+<body>
+
+<div class="particles" id="particles"></div>
+
+<header class="app-header">
+  <div class="brand">
+    <div class="brand-icon">🎤</div>
+    <div class="brand-text">
+      <h1>璀璨之夜</h1>
+      <p>PREMIUM KTV</p>
+    </div>
+  </div>
+  <div class="room-info">
+    <div class="room-label">VIP SUITE · ROYAL</div>
+    <div class="room-title">888 包厢</div>
+  </div>
+  <div class="user-panel">
+    <div class="balance"><span>💎</span><span>¥ 2,880</span></div>
+    <div class="avatar">L</div>
+  </div>
+</header>
+
+<main class="main-layout">
+  <section class="panel floor-plan">
+    <div class="plan-title">
+      <h2>包厢布局</h2>
+      <p>SUITE FLOOR PLAN</p>
+    </div>
+    <div class="plan-grid">
+      <div class="area-card featured active" data-area="singing" onclick="switchArea('singing')">
+        <div class="area-card-img" style="background-image: url('https://images.unsplash.com/photo-1493676304819-0d7a8d026dcf?w=800&q=80&auto=format&fit=crop');"></div>
+        <div class="laser-overlay">
+          <div class="laser l1"></div>
+          <div class="laser l2"></div>
+        </div>
+        <div class="area-card-content">
+          <div class="area-icon-wrap">🎤</div>
+          <div>
+            <div class="area-name">欢唱区</div>
+            <div class="area-sub">SINGING STAGE</div>
+            <div class="area-status busy"><span class="status-dot"></span>正在播放</div>
+          </div>
+        </div>
+      </div>
+      <div class="area-card" data-area="drinking" onclick="switchArea('drinking')">
+        <div class="area-card-img" style="background-image: url('https://images.unsplash.com/photo-1572116469696-31de0f17cc34?w=800&q=80&auto=format&fit=crop');"></div>
+        <div class="area-card-content">
+          <div class="area-icon-wrap">🍸</div>
+          <div>
+            <div class="area-name">酒水区</div>
+            <div class="area-sub">PREMIUM BAR</div>
+            <div class="area-status"><span class="status-dot"></span>已开酒</div>
+          </div>
+        </div>
+      </div>
+      <div class="area-card" data-area="gaming" onclick="switchArea('gaming')">
+        <div class="area-card-img" style="background-image: url('https://images.unsplash.com/photo-1518893063132-36e46dbe2428?w=800&q=80&auto=format&fit=crop');"></div>
+        <div class="area-card-content">
+          <div class="area-icon-wrap">🎲</div>
+          <div>
+            <div class="area-name">游戏区</div>
+            <div class="area-sub">GAME LOUNGE</div>
+            <div class="area-status"><span class="status-dot"></span>空闲</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="plan-grid" style="margin-top: 12px; height: 100px; grid-template-rows: 1fr;">
+      <div class="area-card" data-area="restroom" onclick="switchArea('restroom')" style="min-height: 0;">
+        <div class="area-card-img" style="background-image: url('https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=800&q=80&auto=format&fit=crop');"></div>
+        <div class="area-card-content">
+          <div class="area-icon-wrap">🛁</div>
+          <div>
+            <div class="area-name">休憩区</div>
+            <div class="area-sub">REST LOUNGE</div>
+            <div class="area-status idle"><span class="status-dot"></span>24H 热水供应</div>
+          </div>
+        </div>
+      </div>
+      <div class="area-card" data-area="lounge" onclick="switchArea('lounge')" style="min-height: 0;">
+        <div class="area-card-img" style="background-image: url('https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=800&q=80&auto=format&fit=crop');"></div>
+        <div class="area-card-content">
+          <div class="area-icon-wrap">🛋️</div>
+          <div>
+            <div class="area-name">休闲沙发</div>
+            <div class="area-sub">SOFA LOUNGE</div>
+            <div class="area-status"><span class="status-dot"></span>8人座位</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel detail-panel">
+    <div class="detail-header">
+      <div class="detail-title">
+        <div class="detail-title-icon" id="detailIcon">🎤</div>
+        <div>
+          <h3 id="detailName">欢唱区</h3>
+          <p id="detailSub">SINGING STAGE · 专业级音响</p>
+        </div>
+      </div>
+      <button class="close-btn" onclick="showToast('🔔','呼叫服务员','服务员将在 3 分钟内到达')">✕</button>
+    </div>
+    <div class="detail-content" id="detailContent"></div>
+  </section>
+</main>
+
+<div class="footer-bar">
+  <div class="footer-info">
+    <div>🕒 <strong id="clock">22:48</strong> 使用时长 01:23:45</div>
+    <div>🌡️ 室温 23°C</div>
+    <div>🎵 音量 <span style="color:var(--gold)">●●●●○</span></div>
+  </div>
+  <div class="footer-controls">
+    <div class="volume">
+      <span class="volume-icon">🔊</span>
+      <div class="volume-bar"><div class="volume-fill"></div></div>
+    </div>
+    <button class="ctrl-btn" onclick="showToast('💡','灯光已切换','切换为浪漫模式')">💡 灯光</button>
+    <button class="ctrl-btn" onclick="showToast('🎵','已切换氛围音乐','正在播放爵士轻音乐')">🎵 氛围</button>
+    <button class="ctrl-btn primary" onclick="showToast('🛎️','服务请求已发送','服务员正在前来')">🛎️ 呼叫服务</button>
+  </div>
+</div>
+
+<div class="toast" id="toast">
+  <div class="toast-icon" id="toastIcon">🔔</div>
+  <div class="toast-content">
+    <strong id="toastTitle">提示</strong>
+    <p id="toastMsg">消息内容</p>
+  </div>
+</div>
+
+<div class="fireworks" id="fireworks"></div>
+
+<!-- 音频播放器 -->
+<audio id="audioPlayer" preload="auto" crossorigin="anonymous"></audio>
+
+<script>
+// === 数据 ===
+const SONGS = [
+  { id: 1, title: '海阔天空', artist: 'Beyond', duration: '5:23', audio: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3', lyrics: ['今天我 寒夜里看雪飘过', '怀著冷却了的心窝飘远方', '风雨里追赶 雾里分不清影踪', '天空海阔你与我', '可会变 谁没在变'] },
+  { id: 2, title: '月亮代表我的心', artist: '邓丽君', duration: '3:32', audio: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3', lyrics: ['你问我爱你有多深', '我爱你有几分', '我的情也真 我的爱也真', '月亮代表我的心'] },
+  { id: 3, title: '十年', artist: '陈奕迅', duration: '3:25', audio: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3', lyrics: ['如果那两个字没有颤抖', '我不会发现我难受', '怎么说出口 也不过是分手', '如果对于明天没有要求'] },
+  { id: 4, title: '告白气球', artist: '周杰伦', duration: '3:35', audio: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3', lyrics: ['塞纳河畔 左岸的咖啡', '我手一杯 品尝你的美', '留下唇印的嘴', '花店玫瑰 名字写错谁'] },
+  { id: 5, title: '小幸运', artist: '田馥甄', duration: '4:20', audio: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3', lyrics: ['我听见雨滴落在青青草地', '我听见远方下课钟声响起', '可是我没有听见你的声音', '认真呼唤我姓名'] },
+  { id: 6, title: '童话', artist: '光良', duration: '4:08', audio: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3', lyrics: ['忘了有多久 再没听到你', '对我说你 最爱的故事', '我想了很久 我开始慌了', '是不是我又做错了什么'] },
+  { id: 7, title: '稻香', artist: '周杰伦', duration: '3:42', audio: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-7.mp3', lyrics: ['对这个世界如果你有太多的抱怨', '跌倒了就不敢继续往前走', '为什么人要这么的脆弱堕落'] },
+  { id: 8, title: '演员', artist: '薛之谦', duration: '4:18', audio: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3', lyrics: ['简单点 说话的方式简单点', '递进的情绪请省略', '你又不是个演员', '别设计那些情节'] }
+];
+
+const DRINKS = [
+  { name: '皇家尊享威士忌', desc: '苏格兰 18年单一麦芽', price: 1280, emoji: '🥃', color: 'amber' },
+  { name: '巴黎之花香槟', desc: '法国原装 · 750ml', price: 1880, emoji: '🍾', color: 'pink' },
+  { name: '蓝色夏威夷', desc: '朗姆酒+蓝柑+菠萝', price: 88, emoji: '🍹', color: 'blue' },
+  { name: '莫吉托', desc: '薄荷+青柠+白朗姆', price: 78, emoji: '🍃', color: 'green' },
+  { name: '玛格丽特', desc: '龙舌兰+君度+青柠', price: 88, emoji: '🌵', color: 'green' },
+  { name: '长岛冰茶', desc: '五种基酒调配', price: 98, emoji: '🧊', color: 'amber' },
+  { name: '夜上海特调', desc: '主厨推荐 · 独家配方', price: 168, emoji: '🌃', color: 'purple' },
+  { name: '新鲜扎啤', desc: '德国原装 · 500ml', price: 58, emoji: '🍺', color: 'amber' },
+  { name: '皇家珍藏红酒', desc: '波尔多 82年拉菲', price: 8888, emoji: '🍷', color: 'red' },
+  { name: '进口矿泉水', desc: '依云 · 500ml', price: 38, emoji: '💧', color: 'blue' }
+];
+
+const AMENITIES = [
+  { icon: '🚿', name: '恒温淋浴' },
+  { icon: '🛁', name: '按摩浴缸' },
+  { icon: '🧖', name: '桑拿房' },
+  { icon: '🌸', name: '香薰' },
+  { icon: '📺', name: '智能马桶' },
+  { icon: '🧴', name: '欧舒丹洗护' },
+  { icon: '💆', name: '按摩椅' },
+  { icon: '☕', name: '现磨咖啡' }
+];
+
+// === 状态 ===
+let currentArea = 'singing';
+let currentSongIdx = 0;
+let isPlaying = false;
+let lyricInterval = null;
+let currentLyricIdx = 0;
+let memoryCards = [];
+let memoryFlipped = [];
+let memoryMatched = 0;
+let memoryMoves = 0;
+let isOccupied = false;
+let audioCtx = null;
+let analyser = null;
+let audioSource = null;
+let freqData = null;
+
+// === 切换区域 ===
+function switchArea(area) {
+  currentArea = area;
+  document.querySelectorAll('.area-card').forEach(c => c.classList.remove('active'));
+  document.querySelector(`[data-area="${area}"]`).classList.add('active');
+  renderArea(area);
+  clearIntervals();
+}
+
+// === 渲染区域 ===
+function renderArea(area) {
+  const content = document.getElementById('detailContent');
+  const icon = document.getElementById('detailIcon');
+  const name = document.getElementById('detailName');
+  const sub = document.getElementById('detailSub');
+  
+  if (area === 'singing') {
+    icon.textContent = '🎤';
+    name.textContent = '欢唱区';
+    sub.textContent = 'SINGING STAGE · 专业级音响';
+    content.innerHTML = renderSinging();
+    startLyrics();
+  } else if (area === 'drinking') {
+    icon.textContent = '🍸';
+    name.textContent = '酒水区';
+    sub.textContent = 'PREMIUM BAR · 米其林调酒师';
+    content.innerHTML = renderDrinking();
+  } else if (area === 'gaming') {
+    icon.textContent = '🎲';
+    name.textContent = '游戏区';
+    sub.textContent = 'GAME LOUNGE · 畅玩无限';
+    content.innerHTML = renderGaming();
+  } else if (area === 'restroom') {
+    icon.textContent = '🛁';
+    name.textContent = '休憩区';
+    sub.textContent = 'REST LOUNGE · 总统套房级';
+    content.innerHTML = renderRestroom();
+  } else if (area === 'lounge') {
+    icon.textContent = '🛋️';
+    name.textContent = '休闲沙发区';
+    sub.textContent = 'SOFA LOUNGE · 真皮头等舱';
+    content.innerHTML = renderLounge();
+  }
+}
+
+// === 唱区 ===
+function renderSinging() {
+  const songsHtml = SONGS.map((s, i) => `
+    <div class="song-item ${i === currentSongIdx ? 'playing' : ''}" onclick="playSong(${i})">
+      <div class="song-num">${i === currentSongIdx && isPlaying ? '♪' : (i + 1)}</div>
+      <div class="song-meta">
+        <div class="song-title">${s.title}</div>
+        <div class="song-artist">${s.artist} · ${s.duration}</div>
+      </div>
+      <div class="song-action">${i === currentSongIdx && isPlaying ? '⏸' : '▶'}</div>
+    </div>
+  `).join('');
+
+  return `
+    <div class="singing-view">
+      <div class="karaoke-screen">
+        <div class="karaoke-bg"></div>
+        <div class="stage-light l1"></div>
+        <div class="stage-light l2"></div>
+        <div class="stage-light l3"></div>
+        <div class="stage-light l4"></div>
+        <div class="stage-light l5"></div>
+        <div class="scan-line"></div>
+        <div class="screen-top">
+          <div class="now-playing-tag"><span class="rec-dot"></span>NEXT · 录制中</div>
+          <div class="score-display">
+            <div>本局得分</div>
+            <div class="score-num">98.5</div>
+          </div>
+        </div>
+        <div class="lyrics-area" id="lyricsArea"></div>
+        <div class="screen-bottom">
+          <div class="spectrum" id="spectrum">
+            ${Array(24).fill(0).map(() => '<div class="spec-bar"></div>').join('')}
+          </div>
+          <div class="song-info">
+            <strong>${SONGS[currentSongIdx].title}</strong>
+            ${SONGS[currentSongIdx].artist}
+          </div>
+        </div>
+        <div class="audio-progress">
+          <button class="play-control" id="playBtn" onclick="togglePlay()">${isPlaying ? '⏸' : '▶'}</button>
+          <span id="currentTime">0:00</span>
+          <div class="progress-bar" id="progressBar" onclick="seekAudio(event)">
+            <div class="progress-fill" id="progressFill"></div>
+          </div>
+          <span id="totalTime">${SONGS[currentSongIdx].duration}</span>
+        </div>
+      </div>
+      <div class="song-list">
+        <div class="song-list-title">📋 已点歌曲 <span>${SONGS.length} 首</span></div>
+        ${songsHtml}
+      </div>
+    </div>
+  `;
+}
+
+function playSong(idx) {
+  currentSongIdx = idx;
+  isPlaying = true;
+  currentLyricIdx = 0;
+  renderArea('singing');
+  startAudio(SONGS[idx].audio);
+  showToast('🎵', '正在播放', `${SONGS[idx].title} - ${SONGS[idx].artist}`);
+}
+
+function togglePlay() {
+  const audio = document.getElementById('audioPlayer');
+  if (isPlaying) {
+    audio.pause();
+    isPlaying = false;
+  } else {
+    if (audio.src !== SONGS[currentSongIdx].audio) {
+      startAudio(SONGS[currentSongIdx].audio);
+    } else {
+      audio.play();
+      isPlaying = true;
+    }
+  }
+  document.getElementById('playBtn').textContent = isPlaying ? '⏸' : '▶';
+  updateSongListUI();
+}
+
+function startAudio(url) {
+  const audio = document.getElementById('audioPlayer');
+  audio.src = url;
+  audio.crossOrigin = 'anonymous';
+  
+  if (!audioCtx) {
+    try {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      analyser = audioCtx.createAnalyser();
+      analyser.fftSize = 64;
+      freqData = new Uint8Array(analyser.frequencyBinCount);
+      
+      audioSource = audioCtx.createMediaElementSource(audio);
+      audioSource.connect(analyser);
+      analyser.connect(audioCtx.destination);
+      
+      visualizeSpectrum();
+    } catch (e) {
+      console.warn('Web Audio API error:', e);
+    }
+  }
+  
+  audio.play().then(() => {
+    isPlaying = true;
+    if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+    document.getElementById('playBtn').textContent = '⏸';
+  }).catch(err => {
+    showToast('⚠️', '播放失败', '请点击中央播放按钮开始');
+    isPlaying = false;
+    document.getElementById('playBtn').textContent = '▶';
+  });
+  
+  audio.addEventListener('timeupdate', updateProgress);
+  audio.addEventListener('ended', () => {
+    isPlaying = false;
+    document.getElementById('playBtn').textContent = '▶';
+  });
+}
+
+function updateProgress() {
+  const audio = document.getElementById('audioPlayer');
+  if (!audio.duration) return;
+  const pct = (audio.currentTime / audio.duration) * 100;
+  const fill = document.getElementById('progressFill');
+  if (fill) fill.style.right = (100 - pct) + '%';
+  
+  const ct = document.getElementById('currentTime');
+  if (ct) ct.textContent = formatTime(audio.currentTime);
+}
+
+function formatTime(s) {
+  const m = Math.floor(s / 60);
+  const sec = Math.floor(s % 60);
+  return `${m}:${String(sec).padStart(2, '0')}`;
+}
+
+function seekAudio(e) {
+  const audio = document.getElementById('audioPlayer');
+  const bar = document.getElementById('progressBar');
+  const rect = bar.getBoundingClientRect();
+  const pct = (e.clientX - rect.left) / rect.width;
+  if (audio.duration) audio.currentTime = pct * audio.duration;
+}
+
+function visualizeSpectrum() {
+  const bars = document.querySelectorAll('.spec-bar');
+  function tick() {
+    if (analyser && freqData && bars.length) {
+      analyser.getByteFrequencyData(freqData);
+      const step = Math.floor(freqData.length / bars.length);
+      bars.forEach((bar, i) => {
+        const val = freqData[i * step] || 0;
+        const h = Math.max(8, (val / 255) * 100);
+        bar.style.height = h + '%';
+        bar.style.boxShadow = `0 0 ${4 + val/20}px currentColor`;
+      });
+    }
+    requestAnimationFrame(tick);
+  }
+  tick();
+}
+
+function updateSongListUI() {
+  document.querySelectorAll('.song-item').forEach((item, i) => {
+    if (i === currentSongIdx) {
+      item.classList.add('playing');
+      item.querySelector('.song-num').textContent = isPlaying ? '♪' : (i + 1);
+      item.querySelector('.song-action').textContent = isPlaying ? '⏸' : '▶';
+    } else {
+      item.classList.remove('playing');
+      item.querySelector('.song-num').textContent = (i + 1);
+      item.querySelector('.song-action').textContent = '▶';
+    }
+  });
+}
+
+function startLyrics() {
+  clearIntervals();
+  updateLyrics();
+  lyricInterval = setInterval(() => {
+    if (!isPlaying) return;
+    const song = SONGS[currentSongIdx];
+    currentLyricIdx = (currentLyricIdx + 1) % song.lyrics.length;
+    updateLyrics();
+  }, 2500);
+}
+
+function updateLyrics() {
+  const song = SONGS[currentSongIdx];
+  const area = document.getElementById('lyricsArea');
+  if (!area) return;
+  const prev = (currentLyricIdx - 1 + song.lyrics.length) % song.lyrics.length;
+  const next = (currentLyricIdx + 1) % song.lyrics.length;
+  area.innerHTML = `
+    <div class="lyric-line">${song.lyrics[prev]}</div>
+    <div class="lyric-line active">${song.lyrics[currentLyricIdx]}</div>
+    <div class="lyric-line">${song.lyrics[next]}</div>
+  `;
+}
+
+function clearIntervals() {
+  if (lyricInterval) {
+    clearInterval(lyricInterval);
+    lyricInterval = null;
+  }
+}
+
+// === 酒水区 ===
+function renderDrinking() {
+  const bottles = DRINKS.slice(0, 8);
+  const shelvesHtml = [0, 1].map(row => `
+    <div class="shelf">
+      ${bottles.slice(row * 4, row * 4 + 4).map(d => `
+        <div class="bottle ${d.color}" title="${d.name}">${d.emoji}</div>
+      `).join('')}
+    </div>
+  `).join('');
+  
+  const drinksHtml = DRINKS.map((d, i) => `
+    <div class="drink-item" onclick="orderDrink(${i})">
+      <div class="drink-emoji">${d.emoji}</div>
+      <div class="drink-info">
+        <div class="drink-name">${d.name}</div>
+        <div class="drink-desc">${d.desc}</div>
+      </div>
+      <div class="drink-price">¥${d.price}<small>点单</small></div>
+    </div>
+  `).join('');
+  
+  return `
+    <div class="bar-view">
+      <div class="bar-stage">
+        <div class="bar-stage-bg"></div>
+        <div class="bar-light"></div>
+        <div class="shelf-tag">CHAMPAGNE WALL · 名酒墙</div>
+        <div class="scan-line"></div>
+        ${shelvesHtml}
+        <div class="bar-counter"></div>
+      </div>
+      <div class="menu-list">
+        <div class="song-list-title">📜 酒水单 <span>${DRINKS.length} 款精选</span></div>
+        <div class="menu-tabs">
+          <div class="menu-tab active">全部</div>
+          <div class="menu-tab" onclick="showToast('🍾','已筛选','香槟类酒水')">香槟</div>
+          <div class="menu-tab" onclick="showToast('🥃','已筛选','威士忌')">威士忌</div>
+          <div class="menu-tab" onclick="showToast('🍹','已筛选','鸡尾酒')">鸡尾酒</div>
+          <div class="menu-tab" onclick="showToast('🍺','已筛选','啤酒')">啤酒</div>
+        </div>
+        <div class="drinks-scroll">${drinksHtml}</div>
+      </div>
+    </div>
+  `;
+}
+
+function orderDrink(idx) {
+  const d = DRINKS[idx];
+  showToast('✅', '下单成功', `${d.name} 正在调制中，约 3 分钟送达`);
+  launchFireworks();
+}
+
+// === 游戏区 ===
+function renderGaming() {
+  initMemoryGame();
+  return `
+    <div class="gaming-view">
+      <div class="dice-game">
+        <div class="dice-game-bg"></div>
+        <div class="dice-display">
+          <div class="die" id="die1" data-value="1">
+            <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+            <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+            <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+          </div>
+          <div class="die" id="die2" data-value="1">
+            <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+            <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+            <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+          </div>
+        </div>
+        <div class="dice-info">
+          <div class="dice-title">🎲 双骰比大小</div>
+          <div class="dice-desc">摇出 7 或 11 翻倍奖励！押注 50 元/次</div>
+          <div class="dice-result" id="diceResult">点击下方按钮开始游戏</div>
+          <button class="roll-btn" id="rollBtn" onclick="rollDice()">🎲 摇骰子</button>
+        </div>
+      </div>
+      <div class="slot-game">
+        <div class="slot-icon">🎰</div>
+        <div class="slot-title">幸运老虎机</div>
+        <div class="slot-machine">
+          <div class="slot-reel" id="reel1">7</div>
+          <div class="slot-reel" id="reel2">7</div>
+          <div class="slot-reel" id="reel3">7</div>
+        </div>
+        <div id="slotResult" style="font-size:11px;color:rgba(255,255,255,0.7);margin-bottom:8px;">押注 100 · 三连即中</div>
+        <button class="slot-btn" onclick="spinSlot()">SPIN · 转动</button>
+      </div>
+      <div class="memory-game">
+        <div class="memory-header">
+          <div class="memory-title">🃏 记忆翻牌</div>
+          <div class="memory-stats" id="memStats">步数 0 / 配对 0</div>
+        </div>
+        <div class="memory-grid" id="memoryGrid"></div>
+      </div>
+    </div>
+  `;
+}
+
+function rollDice() {
+  const btn = document.getElementById('rollBtn');
+  btn.disabled = true;
+  const d1 = document.getElementById('die1');
+  const d2 = document.getElementById('die2');
+  d1.classList.add('rolling');
+  d2.classList.add('rolling');
+  
+  let count = 0;
+  const interval = setInterval(() => {
+    d1.setAttribute('data-value', Math.floor(Math.random() * 6) + 1);
+    d2.setAttribute('data-value', Math.floor(Math.random() * 6) + 1);
+    count++;
+    if (count > 8) {
+      clearInterval(interval);
+      const v1 = Math.floor(Math.random() * 6) + 1;
+      const v2 = Math.floor(Math.random() * 6) + 1;
+      const sum = v1 + v2;
+      d1.setAttribute('data-value', v1);
+      d2.setAttribute('data-value', v2);
+      d1.classList.remove('rolling');
+      d2.classList.remove('rolling');
+      const result = document.getElementById('diceResult');
+      if (sum === 7 || sum === 11) {
+        result.textContent = `🎉 恭喜！${v1}+${v2}=${sum}，赢得 ¥150`;
+        result.className = 'dice-result win';
+        launchFireworks();
+        showToast('💰', '押注成功', `赢得 ¥${150}，已加入余额`);
+      } else if (sum === 2 || sum === 12) {
+        result.textContent = `💔 豹子！${v1}+${v2}=${sum}，再接再厉`;
+        result.className = 'dice-result lose';
+      } else {
+        result.textContent = `${v1}+${v2}=${sum}，继续努力！`;
+        result.className = 'dice-result';
+      }
+      btn.disabled = false;
+    }
+  }, 80);
+}
+
+const SLOT_SYMBOLS = ['🍒', '🍋', '🍉', '⭐', '7', '💎', '🔔'];
+function spinSlot() {
+  const r1 = document.getElementById('reel1');
+  const r2 = document.getElementById('reel2');
+  const r3 = document.getElementById('reel3');
+  [r1, r2, r3].forEach(r => r.classList.add('spinning'));
+  
+  let count = 0;
+  const interval = setInterval(() => {
+    r1.textContent = SLOT_SYMBOLS[Math.floor(Math.random() * SLOT_SYMBOLS.length)];
+    r2.textContent = SLOT_SYMBOLS[Math.floor(Math.random() * SLOT_SYMBOLS.length)];
+    r3.textContent = SLOT_SYMBOLS[Math.floor(Math.random() * SLOT_SYMBOLS.length)];
+    count++;
+    if (count > 15) {
+      clearInterval(interval);
+      const s1 = SLOT_SYMBOLS[Math.floor(Math.random() * SLOT_SYMBOLS.length)];
+      const s2 = SLOT_SYMBOLS[Math.floor(Math.random() * SLOT_SYMBOLS.length)];
+      const s3 = SLOT_SYMBOLS[Math.floor(Math.random() * SLOT_SYMBOLS.length)];
+      r1.textContent = s1;
+      r2.textContent = s2;
+      r3.textContent = s3;
+      [r1, r2, r3].forEach(r => r.classList.remove('spinning'));
+      const result = document.getElementById('slotResult');
+      if (s1 === s2 && s2 === s3) {
+        result.textContent = `🎊 大奖！三连 ${s1}，赢得 ¥888`;
+        result.style.color = 'var(--neon-cyan)';
+        result.style.textShadow = '0 0 10px var(--neon-cyan)';
+        launchFireworks();
+      } else if (s1 === s2 || s2 === s3) {
+        result.textContent = `小奖 ${s1}${s2}${s3}，赢得 ¥50`;
+        result.style.color = 'var(--gold)';
+        result.style.textShadow = '0 0 10px var(--gold)';
+      } else {
+        result.textContent = `${s1}${s2}${s3} 再来一次！`;
+        result.style.color = 'rgba(255,255,255,0.7)';
+        result.style.textShadow = 'none';
+      }
+    }
+  }, 60);
+}
+
+const MEMORY_EMOJIS = ['🎤', '🍸', '🎲', '🎵', '💎', '🌹', '🎭', '🎪'];
+function initMemoryGame() {
+  const cards = [...MEMORY_EMOJIS, ...MEMORY_EMOJIS].sort(() => Math.random() - 0.5);
+  memoryCards = cards;
+  memoryFlipped = [];
+  memoryMatched = 0;
+  memoryMoves = 0;
+  
+  setTimeout(() => {
+    const grid = document.getElementById('memoryGrid');
+    if (!grid) return;
+    grid.innerHTML = cards.map((emoji, i) => `
+      <div class="memory-card" data-idx="${i}" data-emoji="${emoji}" onclick="flipCard(${i})">
+        <div class="back">?</div>
+        <div class="front">${emoji}</div>
+      </div>
+    `).join('');
+    const stats = document.getElementById('memStats');
+    if (stats) stats.textContent = `步数 0 / 配对 0`;
+  }, 50);
+}
+
+function flipCard(idx) {
+  if (memoryFlipped.length >= 2) return;
+  if (memoryFlipped.includes(idx)) return;
+  const card = document.querySelector(`[data-idx="${idx}"]`);
+  if (!card || card.classList.contains('matched')) return;
+  card.classList.add('flipped');
+  memoryFlipped.push(idx);
+  
+  if (memoryFlipped.length === 2) {
+    memoryMoves++;
+    const [i1, i2] = memoryFlipped;
+    const c1 = document.querySelector(`[data-idx="${i1}"]`);
+    const c2 = document.querySelector(`[data-idx="${i2}"]`);
+    if (memoryCards[i1] === memoryCards[i2]) {
+      setTimeout(() => {
+        c1.classList.add('matched');
+        c2.classList.add('matched');
+        memoryMatched++;
+        memoryFlipped = [];
+        const stats = document.getElementById('memStats');
+        if (stats) stats.textContent = `步数 ${memoryMoves} / 配对 ${memoryMatched}/8`;
+        if (memoryMatched === 8) {
+          showToast('🏆', '完美通关', `用了 ${memoryMoves} 步完成挑战！`);
+          launchFireworks();
+        }
+      }, 500);
+    } else {
+      setTimeout(() => {
+        c1.classList.remove('flipped');
+        c2.classList.remove('flipped');
+        memoryFlipped = [];
+        const stats = document.getElementById('memStats');
+        if (stats) stats.textContent = `步数 ${memoryMoves} / 配对 ${memoryMatched}/8`;
+      }, 1000);
+    }
+  }
+}
+
+// === 休憩区 ===
+function renderRestroom() {
+  return `
+    <div class="rest-view">
+      <div class="rest-main">
+        <div class="rest-main-bg"></div>
+        <div class="door-status ${isOccupied ? 'occupied' : ''}" id="doorStatus" onclick="toggleDoor()">
+          ${isOccupied ? '🚫' : '✨'}
+        </div>
+        <div class="door-text ${isOccupied ? 'occupied' : ''}" id="doorText">
+          ${isOccupied ? '使用中' : '空闲'}
+        </div>
+        <div class="door-sub" id="doorSub">${isOccupied ? '请稍候' : '欢迎使用'}</div>
+        <button class="door-toggle" onclick="toggleDoor()">
+          ${isOccupied ? '退出' : '进入'}
+        </button>
+      </div>
+      <div class="amenities">
+        <div class="amenities-title">✨ 总统套房配置</div>
+        <div class="amenity-grid">
+          ${AMENITIES.map(a => `
+            <div class="amenity-item">
+              <div class="amenity-icon">${a.icon}</div>
+              <div>${a.name}</div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+      <div class="ambience-control">
+        <div class="amb-title">🎵 氛围控制 <span id="currentMode">浪漫模式</span></div>
+        <div class="amb-modes">
+          <div class="amb-mode active" onclick="setAmbience(this, '浪漫模式')">
+            <div class="amb-mode-icon">🌹</div>浪漫
+          </div>
+          <div class="amb-mode" onclick="setAmbience(this, '商务模式')">
+            <div class="amb-mode-icon">💼</div>商务
+          </div>
+          <div class="amb-mode" onclick="setAmbience(this, '派对模式')">
+            <div class="amb-mode-icon">🎉</div>派对
+          </div>
+          <div class="amb-mode" onclick="setAmbience(this, '休憩模式')">
+            <div class="amb-mode-icon">😴</div>休憩
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function toggleDoor() {
+  isOccupied = !isOccupied;
+  renderArea('restroom');
+  showToast('🚪', isOccupied ? '已上锁' : '已解锁', isOccupied ? '请勿打扰模式已开启' : '欢迎光临');
+}
+
+function setAmbience(el, mode) {
+  document.querySelectorAll('.amb-mode').forEach(m => m.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('currentMode').textContent = mode;
+  showToast('🎨', '氛围已切换', `当前为「${mode}」`);
+}
+
+// === 沙发区 ===
+function renderLounge() {
+  return `
+    <div style="display:flex;flex-direction:column;gap:16px;height:100%;">
+      <div style="position:relative;background:url('https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=1200&q=80&auto=format&fit=crop') center/cover;border:1.5px solid rgba(212,175,55,0.3);border-radius:14px;padding:24px;text-align:center;min-height:180px;display:flex;flex-direction:column;justify-content:center;align-items:center;overflow:hidden;">
+        <div style="position:absolute;inset:0;background:linear-gradient(135deg,rgba(42,18,69,0.7),rgba(7,4,13,0.8));"></div>
+        <div style="position:relative;z-index:2;">
+          <div style="font-size:60px;margin-bottom:12px;">🛋️</div>
+          <h3 style="font-size:24px;color:var(--gold);margin-bottom:8px;letter-spacing:3px;text-shadow:0 0 15px rgba(212,175,55,0.5);">U 型真皮沙发</h3>
+          <p style="color:rgba(255,255,255,0.8);font-size:13px;margin-bottom:16px;">意大利进口头层小牛皮 · 8 人座位</p>
+          <div style="display:flex;justify-content:center;gap:12px;flex-wrap:wrap;">
+            <div style="background:rgba(212,175,55,0.2);border:1px solid var(--gold);padding:6px 14px;border-radius:16px;font-size:11px;color:var(--gold);backdrop-filter:blur(8px);">📺 75寸电视</div>
+            <div style="background:rgba(212,175,55,0.2);border:1px solid var(--gold);padding:6px 14px;border-radius:16px;font-size:11px;color:var(--gold);backdrop-filter:blur(8px);">🔌 USB充电</div>
+            <div style="background:rgba(212,175,55,0.2);border:1px solid var(--gold);padding:6px 14px;border-radius:16px;font-size:11px;color:var(--gold);backdrop-filter:blur(8px);">❄️ 空调出风</div>
+            <div style="background:rgba(212,175,55,0.2);border:1px solid var(--gold);padding:6px 14px;border-radius:16px;font-size:11px;color:var(--gold);backdrop-filter:blur(8px);">💡 氛围灯</div>
+          </div>
+        </div>
+      </div>
+      <div style="background:linear-gradient(135deg,rgba(42,18,69,0.5),rgba(21,8,42,0.7));border:1.5px solid rgba(212,175,55,0.2);border-radius:14px;padding:20px;flex:1;backdrop-filter:blur(8px);">
+        <div class="amenities-title" style="margin-bottom:14px;">👥 在场嘉宾</div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;">
+          ${['L', 'M', 'W', 'Z', 'C', 'Y', 'X', 'Q'].map((n, i) => `
+            <div style="text-align:center;cursor:pointer;" onclick="showToast('👋','已邀请','${n} 正在加入派对')">
+              <div style="width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg, hsl(${i*45},70%,60%), hsl(${i*45+60},70%,50%));display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:18px;margin:0 auto 6px;border:2px solid var(--gold);box-shadow:0 0 10px rgba(212,175,55,0.3);">${n}</div>
+              <div style="font-size:10px;color:var(--text-muted);">嘉宾${i+1}</div>
+            </div>
+          `).join('')}
+        </div>
+        <button class="ctrl-btn primary" style="width:100%;margin-top:16px;justify-content:center;padding:12px;" onclick="showToast('➕','已发送邀请','邀请好友加入 KTV')">+ 邀请好友</button>
+      </div>
+    </div>
+  `;
+}
+
+// === 通知 ===
+function showToast(icon, title, msg) {
+  const toast = document.getElementById('toast');
+  document.getElementById('toastIcon').textContent = icon;
+  document.getElementById('toastTitle').textContent = title;
+  document.getElementById('toastMsg').textContent = msg;
+  toast.classList.add('show');
+  clearTimeout(window._toastTimer);
+  window._toastTimer = setTimeout(() => toast.classList.remove('show'), 2800);
+}
+
+// === 烟花 ===
+function launchFireworks() {
+  const container = document.getElementById('fireworks');
+  const colors = ['#d4af37', '#ff006e', '#00f5ff', '#9d4edd', '#ffd700', '#39ff14'];
+  
+  for (let i = 0; i < 3; i++) {
+    setTimeout(() => {
+      const x = Math.random() * window.innerWidth;
+      const y = Math.random() * window.innerHeight * 0.5 + 100;
+      const color = colors[Math.floor(Math.random() * colors.length)];
+      
+      for (let j = 0; j < 20; j++) {
+        const fw = document.createElement('div');
+        fw.className = 'firework';
+        fw.style.left = x + 'px';
+        fw.style.top = y + 'px';
+        fw.style.background = color;
+        fw.style.boxShadow = `0 0 6px ${color}, 0 0 12px ${color}`;
+        const angle = (j / 20) * Math.PI * 2;
+        const dist = 60 + Math.random() * 100;
+        fw.style.setProperty('--x', Math.cos(angle) * dist + 'px');
+        fw.style.setProperty('--y', Math.sin(angle) * dist + 'px');
+        container.appendChild(fw);
+        setTimeout(() => fw.remove(), 1500);
+      }
+    }, i * 250);
+  }
+}
+
+// === 颗粒 ===
+function createParticles() {
+  const container = document.getElementById('particles');
+  const colors = ['#d4af37', '#ffd700', '#ff006e', '#00f5ff', '#9d4edd'];
+  for (let i = 0; i < 40; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    p.style.left = Math.random() * 100 + '%';
+    p.style.animationDelay = Math.random() * 8 + 's';
+    p.style.animationDuration = (6 + Math.random() * 4) + 's';
+    p.style.background = colors[Math.floor(Math.random() * colors.length)];
+    p.style.color = p.style.background;
+    container.appendChild(p);
+  }
+}
+
+// === 时钟 ===
+function updateClock() {
+  const now = new Date();
+  const h = String(now.getHours()).padStart(2, '0');
+  const m = String(now.getMinutes()).padStart(2, '0');
+  document.getElementById('clock').textContent = `${h}:${m}`;
+}
+
+// === 初始化 ===
+window.addEventListener('load', () => {
+  createParticles();
+  updateClock();
+  setInterval(updateClock, 60000);
+  renderArea('singing');
+  
+  setTimeout(() => {
+    showToast('🎉', '欢迎光临璀璨之夜', 'VIP 888 总统包厢已为您准备就绪');
+  }, 600);
+});
+</script>
+</body>
+</html>
