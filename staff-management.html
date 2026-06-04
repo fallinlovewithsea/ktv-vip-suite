@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KTV 工作人员管理系统</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg-dark: #07040d;
+  --bg-purple: #15082a;
+  --gold: #d4af37;
+  --gold-light: #ffd700;
+  --neon-pink: #ff006e;
+  --neon-cyan: #00f5ff;
+  --neon-purple: #9d4edd;
+  --neon-green: #39ff14;
+  --text-muted: rgba(255, 255, 255, 0.5);
+}
+
+body {
+  font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  background: var(--bg-dark);
+  color: #fff;
+  min-height: 100vh;
+  overflow-x: hidden;
+  position: relative;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(circle at 15% 25%, rgba(157, 78, 221, 0.2) 0%, transparent 45%),
+    radial-gradient(circle at 85% 75%, rgba(255, 0, 110, 0.15) 0%, transparent 45%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.particles { position: fixed; inset: 0; z-index: 1; pointer-events: none; overflow: hidden; }
+.particle {
+  position: absolute;
+  width: 2px; height: 2px;
+  background: var(--gold);
+  border-radius: 50%;
+  opacity: 0;
+  animation: float 8s linear infinite;
+  box-shadow: 0 0 6px currentColor;
+}
+@keyframes float {
+  0% { transform: translateY(100vh) translateX(0); opacity: 0; }
+  10% { opacity: 0.8; }
+  90% { opacity: 0.8; }
+  100% { transform: translateY(-10vh) translateX(50px); opacity: 0; }
+}
+
+.page-container {
+  position: relative;
+  z-index: 5;
+  padding: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.page-header {
+  text-align: center;
+  margin-bottom: 40px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+}
+
+.page-title {
+  font-size: 36px;
+  font-weight: bold;
+  background: linear-gradient(45deg, var(--gold), var(--gold-light));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 8px;
+  letter-spacing: 3px;
+}
+
+.page-subtitle {
+  font-size: 14px;
+  color: var(--text-muted);
+  letter-spacing: 2px;
+}
+
+.control-panel {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 16px;
+  margin-bottom: 36px;
+  padding: 24px;
+  background: linear-gradient(135deg, rgba(21, 8, 42, 0.7), rgba(7, 4, 13, 0.9));
+  border: 1px solid rgba(212, 175, 55, 0.2);
+  border-radius: 16px;
+  backdrop-filter: blur(12px);
+}
+
+.control-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.control-label {
+  font-size: 12px;
+  color: var(--gold);
+  letter-spacing: 2px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.control-input {
+  padding: 10px 14px;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  border-radius: 8px;
+  color: #fff;
+  font-size: 13px;
+}
+
+.control-input::placeholder {
+  color: var(--text-muted);
+}
+
+.control-btn {
+  padding: 10px 20px;
+  background: linear-gradient(135deg, var(--gold), var(--gold-light));
+  border: none;
+  border-radius: 8px;
+  color: var(--bg-dark);
+  font-size: 13px;
+  font-weight: bold;
+  cursor: pointer;
+  letter-spacing: 1px;
+  box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4);
+  transition: all 0.3s;
+}
+
+.control-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(212, 175, 55, 0.6);
+}
+
+.control-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.staff-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 24px;
+  margin-bottom: 40px;
+}
+
+.staff-card {
+  background: linear-gradient(135deg, rgba(21, 8, 42, 0.7), rgba(7, 4, 13, 0.9));
+  border: 1.5px solid rgba(212, 175, 55, 0.2);
+  border-radius: 16px;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.staff-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  z-index: 1;
+}
+
+.staff-card:hover {
+  transform: translateY(-8px);
+  border-color: var(--gold);
+  box-shadow: 0 12px 40px rgba(212, 175, 55, 0.4), 0 0 60px rgba(212, 175, 55, 0.2);
+}
+
+.staff-avatar-section {
+  position: relative;
+  height: 280px;
+  overflow: hidden;
+  background: #000;
+}
+
+.staff-avatar {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.staff-card:hover .staff-avatar {
+  transform: scale(1.08);
+}
+
+.status-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  backdrop-filter: blur(8px);
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  animation: pulse 1.5s ease-in-out infinite;
+  box-shadow: 0 0 8px currentColor;
+}
+
+.status-on-duty {
+  background: rgba(57, 255, 20, 0.2);
+  border: 1px solid rgba(57, 255, 20, 0.5);
+  color: var(--neon-green);
+}
+
+.status-on-duty .status-dot {
+  background: var(--neon-green);
+}
+
+.status-busy {
+  background: rgba(255, 0, 110, 0.2);
+  border: 1px solid rgba(255, 0, 110, 0.5);
+  color: var(--neon-pink);
+}
+
+.status-busy .status-dot {
+  background: var(--neon-pink);
+}
+
+.status-break {
+  background: rgba(255, 215, 0, 0.2);
+  border: 1px solid rgba(255, 215, 0, 0.5);
+  color: var(--gold-light);
+}
+
+.status-break .status-dot {
+  background: var(--gold-light);
+}
+
+.status-offline {
+  background: rgba(100, 100, 100, 0.2);
+  border: 1px solid rgba(100, 100, 100, 0.5);
+  color: #999;
+}
+
+.status-offline .status-dot {
+  background: #999;
+  animation: none;
+}
+
+.staff-info {
+  padding: 20px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.staff-header {
+  margin-bottom: 14px;
+}
+
+.staff-name {
+  font-size: 18px;
+  font-weight: bold;
+  color: #fff;
+  margin-bottom: 4px;
+  letter-spacing: 1px;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+}
+
+.staff-position {
+  font-size: 12px;
+  color: var(--gold);
+  letter-spacing: 1px;
+  font-weight: 500;
+}
+
+.staff-details {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 14px;
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 10px;
+  border-left: 2px solid var(--gold);
+}
+
+.detail-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+}
+
+.detail-label {
+  color: var(--text-muted);
+  letter-spacing: 1px;
+}
+
+.detail-value {
+  color: var(--neon-cyan);
+  font-weight: 600;
+}
+
+.staff-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.action-btn {
+  flex: 1;
+  padding: 8px 12px;
+  background: rgba(212, 175, 55, 0.1);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  border-radius: 8px;
+  color: var(--gold);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  letter-spacing: 1px;
+}
+
+.action-btn:hover {
+  background: rgba(212, 175, 55, 0.2);
+  border-color: var(--gold);
+  box-shadow: 0 0 12px rgba(212, 175, 55, 0.3);
+}
+
+.action-btn.primary {
+  background: linear-gradient(135deg, var(--neon-pink), var(--neon-purple));
+  border: none;
+  color: #fff;
+}
+
+.action-btn.primary:hover {
+  box-shadow: 0 0 15px rgba(255, 0, 110, 0.5);
+}
+
+.photos-section {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(212, 175, 55, 0.15);
+}
+
+.photos-label {
+  font-size: 10px;
+  color: var(--gold);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-weight: 600;
+}
+
+.photos-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.photo-thumb {
+  position: relative;
+  aspect-ratio: 3/4;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid rgba(212, 175, 55, 0.2);
+  cursor: pointer;
+  transition: all 0.3s;
+  background: #000;
+}
+
+.photo-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s;
+}
+
+.photo-thumb:hover {
+  border-color: var(--gold);
+  box-shadow: 0 0 15px rgba(212, 175, 55, 0.4);
+}
+
+.photo-thumb:hover img {
+  transform: scale(1.05);
+}
+
+.photo-type {
+  position: absolute;
+  bottom: 4px;
+  left: 4px;
+  right: 4px;
+  background: rgba(0, 0, 0, 0.8);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 8px;
+  color: var(--neon-cyan);
+  text-align: center;
+  letter-spacing: 1px;
+}
+
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  backdrop-filter: blur(5px);
+}
+
+.modal.active {
+  display: flex;
+}
+
+.modal-content {
+  background: linear-gradient(135deg, rgba(21, 8, 42, 0.95), rgba(7, 4, 13, 0.95));
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  border-radius: 20px;
+  padding: 32px;
+  max-width: 600px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+}
+
+.modal-title {
+  font-size: 24px;
+  font-weight: bold;
+  color: var(--gold);
+}
+
+.modal-close {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(212, 175, 55, 0.2);
+  color: var(--gold);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  transition: all 0.3s;
+}
+
+.modal-close:hover {
+  background: rgba(212, 175, 55, 0.1);
+  transform: rotate(90deg);
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text-muted);
+}
+
+.empty-icon {
+  font-size: 64px;
+  margin-bottom: 16px;
+  opacity: 0.5;
+}
+
+.empty-text {
+  font-size: 16px;
+  margin-bottom: 8px;
+}
+
+.empty-subtext {
+  font-size: 12px;
+  letter-spacing: 1px;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.8); }
+}
+
+@media (max-width: 768px) {
+  .staff-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .control-panel {
+    grid-template-columns: 1fr;
+  }
+  
+  .page-title {
+    font-size: 24px;
+  }
+}
+</style>
+</head>
+<body>
+<div id="particles" class="particles"></div>
+
+<div class="page-container">
+  <div class="page-header">
+    <h1 class="page-title">👥 KTV 工作人员管理</h1>
+    <p class="page-subtitle">AIGC 生成的真实风格员工档案</p>
+  </div>
+
+  <div class="control-panel">
+    <div class="control-group">
+      <label class="control-label">员工数量</label>
+      <input type="number" id="staffCount" class="control-input" value="6" min="1" max="20">
+    </div>
+    <div class="control-group">
+      <label class="control-label">生成风格</label>
+      <select id="styleSelect" class="control-input">
+        <option value="professional">专业风格</option>
+        <option value="casual">休闲风格</option>
+        <option value="elegant">优雅风格</option>
+      </select>
+    </div>
+    <div class="control-group">
+      <label class="control-label">员工类型</label>
+      <select id="positionSelect" class="control-input">
+        <option value="mixed">混合类型</option>
+        <option value="waiter">服务员</option>
+        <option value="manager">经理</option>
+        <option value="technician">技术员</option>
+      </select>
+    </div>
+    <div class="control-group">
+      <button class="control-btn" id="generateBtn">🎨 生成员工档案</button>
+    </div>
+  </div>
+
+  <div class="staff-grid" id="staffGrid">
+    <div class="empty-state">
+      <div class="empty-icon">👤</div>
+      <div class="empty-text">暂无员工档案</div>
+      <div class="empty-subtext">点击 "生成员工档案" 开始创建</div>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="detailModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2 class="modal-title" id="modalTitle">员工详情</h2>
+      <div class="modal-close" onclick="closeDetailModal()">✕</div>
+    </div>
+    <div id="modalBody"></div>
+  </div>
+</div>
+
+<script>
+class StaffManager {
+  constructor() {
+    this.staff = [];
+    this.positions = ['服务员', '调酒师', '经理', '技术员', '保安', '前台'];
+    this.statuses = ['在岗', '忙碌', '休息', '离线'];
+  }
+
+  generateStaff(count, style = 'professional', position = 'mixed') {
+    this.staff = [];
+    
+    for (let i = 0; i < count; i++) {
+      const staff = {
+        id: `staff_${Date.now()}_${i}`,
+        name: this.generateName(),
+        position: position === 'mixed' ? this.positions[Math.floor(Math.random() * this.positions.length)] : position,
+        status: this.statuses[Math.floor(Math.random() * this.statuses.length)],
+        rating: (Math.random() * 2 + 3).toFixed(1),
+        workExperience: Math.floor(Math.random() * 8) + 1,
+        style: style,
+        joinDate: this.generateDate(),
+        photos: this.generatePhotoUrls(i, style)
+      };
+      this.staff.push(staff);
+    }
+    
+    return this.staff;
+  }
+
+  generateName() {
+    const surnames = ['王', '李', '张', '刘', '陈', '杨', '赵', '黄', '周', '吴', '徐', '孙', '林', '郑', '何'];
+    const firstNames = ['明', '晓', '芳', '娟', '燕', '超', '军', '伟', '刚', '峰', '强', '鹏', '云', '辉', '雪'];
+    
+    const surname = surnames[Math.floor(Math.random() * surnames.length)];
+    const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
+    
+    return surname + firstName;
+  }
+
+  generateDate() {
+    const date = new Date();
+    date.setMonth(date.getMonth() - Math.floor(Math.random() * 36));
+    return date.toISOString().split('T')[0];
+  }
+
+  generatePhotoUrls(index, style) {
+    const seed = Date.now() + index;
+    
+    return {
+      avatar: `https://i.pravatar.cc/200?img=${index * 7}`,
+      halfBody: `https://i.pravatar.cc/400?img=${index * 7 + 1}`,
+      fullBody: `https://picsum.photos/300/450?random=${seed}`,
+      working: `https://picsum.photos/300/450?random=${seed + 100}`,
+      break: `https://picsum.photos/300/450?random=${seed + 200}`,
+      offline: `https://picsum.photos/300/450?random=${seed + 300}`
+    };
+  }
+
+  updateStatus(staffId, newStatus) {
+    const staff = this.staff.find(s => s.id === staffId);
+    if (staff) {
+      staff.status = newStatus;
+      this.renderStaff();
+    }
+  }
+
+  removeStaff(staffId) {
+    this.staff = this.staff.filter(s => s.id !== staffId);
+    this.renderStaff();
+  }
+
+  renderStaff() {
+    const grid = document.getElementById('staffGrid');
+    
+    if (this.staff.length === 0) {
+      grid.innerHTML = `
+        <div class="empty-state" style="grid-column: 1 / -1;">
+          <div class="empty-icon">👤</div>
+          <div class="empty-text">暂无员工档案</div>
+          <div class="empty-subtext">点击 "生成员工档案" 开始创建</div>
+        </div>
+      `;
+      return;
+    }
+
+    grid.innerHTML = this.staff.map(staff => this.createStaffCard(staff)).join('');
+    this.attachEventListeners();
+  }
+
+  createStaffCard(staff) {
+    const statusMap = {
+      '在岗': { class: 'status-on-duty', text: '🟢 在岗' },
+      '忙碌': { class: 'status-busy', text: '🔴 忙碌' },
+      '休息': { class: 'status-break', text: '🟡 休息' },
+      '离线': { class: 'status-offline', text: '⚫ 离线' }
+    };
+
+    const status = statusMap[staff.status];
+    const avatarUrl = staff.photos.avatar;
+
+    return `
+      <div class="staff-card" data-id="${staff.id}">
+        <div class="staff-avatar-section">
+          <img src="${avatarUrl}" alt="${staff.name}" class="staff-avatar" onerror="this.src='https://via.placeholder.com/300x280?text=${staff.name}'">
+          <div class="status-badge ${status.class}">
+            <span class="status-dot"></span>
+            <span>${status.text}</span>
+          </div>
+        </div>
+        
+        <div class="staff-info">
+          <div class="staff-header">
+            <div class="staff-name">${staff.name}</div>
+            <div class="staff-position">${staff.position}</div>
+          </div>
+
+          <div class="staff-details">
+            <div class="detail-item">
+              <span class="detail-label">评分</span>
+              <span class="detail-value">⭐ ${staff.rating}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">经验</span>
+              <span class="detail-value">${staff.workExperience} 年</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">加入日期</span>
+              <span class="detail-value">${staff.joinDate}</span>
+            </div>
+          </div>
+
+          <div class="photos-section">
+            <div class="photos-label">📸 多类型照片</div>
+            <div class="photos-grid">
+              <div class="photo-thumb" onclick="previewPhoto('${staff.photos.fullBody}', '全身像')">
+                <img src="${staff.photos.fullBody}" alt="全身像" onerror="this.src='https://via.placeholder.com/100x130'">
+                <div class="photo-type">全身</div>
+              </div>
+              <div class="photo-thumb" onclick="previewPhoto('${staff.photos.halfBody}', '半身像')">
+                <img src="${staff.photos.halfBody}" alt="半身像" onerror="this.src='https://via.placeholder.com/100x130'">
+                <div class="photo-type">半身</div>
+              </div>
+              <div class="photo-thumb" onclick="previewPhoto('${staff.photos.working}', '工作状态')">
+                <img src="${staff.photos.working}" alt="工作状态" onerror="this.src='https://via.placeholder.com/100x130'">
+                <div class="photo-type">工作</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="staff-actions">
+            <button class="action-btn" onclick="changeStatus('${staff.id}')">📋 改变状态</button>
+            <button class="action-btn primary" onclick="viewDetails('${staff.id}')">👁️ 查看详情</button>
+            <button class="action-btn" onclick="removeStaff('${staff.id}')">🗑️ 删除</button>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  attachEventListeners() {
+    document.querySelectorAll('.staff-card').forEach(card => {
+      card.addEventListener('mouseenter', function() {
+        this.style.zIndex = '10';
+      });
+    });
+  }
+}
+
+const staffManager = new StaffManager();
+
+document.getElementById('generateBtn').addEventListener('click', () => {
+  const count = parseInt(document.getElementById('staffCount').value);
+  const style = document.getElementById('styleSelect').value;
+  const position = document.getElementById('positionSelect').value;
+  
+  staffManager.generateStaff(count, style, position);
+  staffManager.renderStaff();
+});
+
+function changeStatus(staffId) {
+  const staff = staffManager.staff.find(s => s.id === staffId);
+  if (!staff) return;
+  
+  const statuses = ['在岗', '忙碌', '休息', '离线'];
+  const currentIndex = statuses.indexOf(staff.status);
+  const nextStatus = statuses[(currentIndex + 1) % statuses.length];
+  
+  staffManager.updateStatus(staffId, nextStatus);
+}
+
+function removeStaff(staffId) {
+  if (confirm('确定删除该员工吗？')) {
+    staffManager.removeStaff(staffId);
+  }
+}
+
+function viewDetails(staffId) {
+  const staff = staffManager.staff.find(s => s.id === staffId);
+  if (!staff) return;
+  
+  document.getElementById('modalTitle').textContent = staff.name + ' - 详细档案';
+  
+  const statusMap = {
+    '在岗': '🟢 在岗',
+    '忙碌': '🔴 忙碌',
+    '休息': '🟡 休息',
+    '离线': '⚫ 离线'
+  };
+
+  document.getElementById('modalBody').innerHTML = `
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+      <img src="${staff.photos.avatar}" alt="${staff.name}" style="width: 100%; border-radius: 12px; border: 1px solid rgba(212, 175, 55, 0.3);">
+      
+      <div>
+        <div style="margin-bottom: 16px;">
+          <div style="font-size: 14px; color: var(--text-muted); margin-bottom: 4px;">岗位</div>
+          <div style="font-size: 18px; font-weight: bold; color: var(--gold);">${staff.position}</div>
+        </div>
+        
+        <div style="margin-bottom: 16px;">
+          <div style="font-size: 14px; color: var(--text-muted); margin-bottom: 4px;">状态</div>
+          <div style="font-size: 16px; color: var(--neon-cyan);">${statusMap[staff.status]}</div>
+        </div>
+        
+        <div style="margin-bottom: 16px;">
+          <div style="font-size: 14px; color: var(--text-muted); margin-bottom: 4px;">评分</div>
+          <div style="font-size: 18px; color: var(--neon-green);">⭐ ${staff.rating}</div>
+        </div>
+        
+        <div style="margin-bottom: 16px;">
+          <div style="font-size: 14px; color: var(--text-muted); margin-bottom: 4px;">工作经验</div>
+          <div style="font-size: 16px; color: #fff;">${staff.workExperience} 年</div>
+        </div>
+        
+        <div>
+          <div style="font-size: 14px; color: var(--text-muted); margin-bottom: 4px;">加入日期</div>
+          <div style="font-size: 16px; color: #fff;">${staff.joinDate}</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top: 24px; padding-top: 20px; border-top: 1px solid rgba(212, 175, 55, 0.2);">
+      <h3 style="font-size: 14px; color: var(--gold); margin-bottom: 14px; letter-spacing: 1px;">📸 完整照片库</h3>
+      <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;">
+        <div style="border-radius: 10px; overflow: hidden; border: 1px solid rgba(212, 175, 55, 0.2);">
+          <img src="${staff.photos.fullBody}" alt="全身像" style="width: 100%; height: 200px; object-fit: cover;">
+          <div style="padding: 8px; background: rgba(0, 0, 0, 0.5); text-align: center; font-size: 11px; color: var(--neon-cyan);">全身像</div>
+        </div>
+        <div style="border-radius: 10px; overflow: hidden; border: 1px solid rgba(212, 175, 55, 0.2);">
+          <img src="${staff.photos.halfBody}" alt="半身像" style="width: 100%; height: 200px; object-fit: cover;">
+          <div style="padding: 8px; background: rgba(0, 0, 0, 0.5); text-align: center; font-size: 11px; color: var(--neon-cyan);">半身像</div>
+        </div>
+        <div style="border-radius: 10px; overflow: hidden; border: 1px solid rgba(212, 175, 55, 0.2);">
+          <img src="${staff.photos.working}" alt="工作状态" style="width: 100%; height: 200px; object-fit: cover;">
+          <div style="padding: 8px; background: rgba(0, 0, 0, 0.5); text-align: center; font-size: 11px; color: var(--neon-cyan);">工作状态</div>
+        </div>
+        <div style="border-radius: 10px; overflow: hidden; border: 1px solid rgba(212, 175, 55, 0.2);">
+          <img src="${staff.photos.break}" alt="休息状态" style="width: 100%; height: 200px; object-fit: cover;">
+          <div style="padding: 8px; background: rgba(0, 0, 0, 0.5); text-align: center; font-size: 11px; color: var(--neon-cyan);">休息状态</div>
+        </div>
+      </div>
+    </div>
+  `;
+  
+  document.getElementById('detailModal').classList.add('active');
+}
+
+function previewPhoto(url, type) {
+  console.log('预览照片:', type, url);
+}
+
+function closeDetailModal() {
+  document.getElementById('detailModal').classList.remove('active');
+}
+
+document.getElementById('detailModal').addEventListener('click', function(e) {
+  if (e.target === this) {
+    closeDetailModal();
+  }
+});
+
+function createParticles() {
+  const container = document.getElementById('particles');
+  const particleCount = 30;
+  
+  for (let i = 0; i < particleCount; i++) {
+    const particle = document.createElement('div');
+    particle.className = 'particle';
+    particle.style.left = Math.random() * 100 + '%';
+    particle.style.width = Math.random() * 3 + 1 + 'px';
+    particle.style.height = particle.style.width;
+    particle.style.animation = `float ${8 + Math.random() * 4}s linear infinite`;
+    particle.style.animationDelay = Math.random() * 5 + 's';
+    container.appendChild(particle);
+  }
+}
+
+createParticles();
+
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    document.getElementById('generateBtn').click();
+  }, 500);
+});
+</script>
+</body>
+</html>
